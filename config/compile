@@ -1,8 +1,7 @@
 #! /bin/sh
-# shellcheck disable=all
 # Wrapper for compilers which do not understand '-c -o'.
 
-scriptversion=2025-06-18.21; # UTC
+scriptversion=2026-06-15.15; # UTC
 
 # Copyright (C) 1999-2025 Free Software Foundation, Inc.
 # Written by Tom Tromey <tromey@cygnus.com>.
