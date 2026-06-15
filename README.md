@@ -1,34 +1,31 @@
-<div align="center">
-  
 # 🛡️ SHC - Shell Script Compiler 🚀
-**Generic Shell Script Compiler with Enhanced Security & Auditing**
+
+Generic Shell Script Compiler with Enhanced Security & Auditing
 
 [![Latest Version](https://img.shields.io/github/v/release/alsyundawy/shc)](https://github.com/alsyundawy/shc/releases)
 [![Build Status](https://img.shields.io/travis/alsyundawy/shc/release)](https://travis-ci.org/alsyundawy/shc)
-[![ShellCheck](https://img.shields.io/badge/ShellCheck-Passing-brightgreen.svg)](#%EF%B8%8F-code-quality)
-[![Bash](https://img.shields.io/badge/Shell-Bash%205%2B-orange.svg)](#-requirements)
+[![ShellCheck](https://img.shields.io/badge/ShellCheck-Passing-brightgreen.svg)](https://github.com/alsyundawy/shc)
+[![Bash](https://img.shields.io/badge/Shell-Bash%205%2B-orange.svg)](https://github.com/alsyundawy/shc)
 [![Maintenance Status](https://img.shields.io/maintenance/yes/9999)](https://github.com/alsyundawy/shc/)
 [![License](https://img.shields.io/github/license/alsyundawy/shc)](https://github.com/alsyundawy/shc/blob/master/LICENSE)
-<br>
+
 [![GitHub Issues](https://img.shields.io/github/issues/alsyundawy/shc)](https://github.com/alsyundawy/shc/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/alsyundawy/shc)](https://github.com/alsyundawy/shc/pulls)
 [![GitHub Stars](https://img.shields.io/github/stars/alsyundawy/shc?style=social)](https://github.com/alsyundawy/shc/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/alsyundawy/shc?style=social)](https://github.com/alsyundawy/shc/network/members)
 [![GitHub Contributors](https://img.shields.io/github/contributors/alsyundawy/shc?style=social)](https://github.com/alsyundawy/shc/graphs/contributors)
-<br>
+
 [![Donate with PayPal](https://img.shields.io/badge/PayPal-donate-orange)](https://www.paypal.me/alsyundawy)
 [![Sponsor with GitHub](https://img.shields.io/badge/GitHub-sponsor-orange)](https://github.com/sponsors/alsyundawy)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
-*Empowering Developers • Securing Shell Scripts • Open Source Passion*
-
-</div>
+Empowering Developers • Securing Shell Scripts • Open Source Passion
 
 ---
 
 ## 📖 Overview
 
-**Shc** takes a script, which is specified on the command line, and produces **C source code**. The generated source code is then compiled and linked to produce a stripped binary executable. 
+**Shc** takes a script, which is specified on the command line, and produces **C source code**. The generated source code is then compiled and linked to produce a stripped binary executable.
 
 > **Insight:** `shc` itself is not a compiler such as `cc`. It rather encodes and encrypts a shell script and generates C source code with an added expiration capability. It then uses the system compiler to compile a stripped binary which behaves exactly like the original script. Upon execution, the compiled binary will decrypt and execute the code with the shell `-c` option.
 
@@ -60,6 +57,7 @@ Then, compile and install from the source:
 make
 sudo make install
 ```
+
 *(**Note:** If `make` fails due to **automake**'s version, ensure you have run `./autogen.sh` before running the commands.)*
 
 ### 🐧 Debian GNU/Linux and Ubuntu Systems
@@ -118,6 +116,7 @@ make test
 Temporary directories are generated in `${TMPDIR:-/tmp}/shc.SHELL.OPT.XXXXXX` (caps are replaced according to the test). When a test succeeds, the directory is removed; if it fails, it is kept to help with debugging.
 
 Clean up test outputs manually with:
+
 ```bash
 rm -rf ${TMPDIR:-/tmp}/shc.*
 ```
@@ -134,7 +133,7 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 
 ## 🔒 CHANGES - Audit & Hardening
 
-**By HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION**
+> **By HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION**
 
 ### 🌟 LATEST: MON Jun 15 19:52:11 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
@@ -204,7 +203,7 @@ If you change anything related to `autotools`, `./autogen.sh` should be run to r
 
 ## 🏆 Credits & Acknowledgements
 
-This project is a hardened and heavily audited iteration built upon the incredible foundational work of **[neurobin](https://github.com/neurobin)**. 
+This project is a hardened and heavily audited iteration built upon the incredible foundational work of **[neurobin](https://github.com/neurobin)**.
 Huge thanks to the original author and the contributors of the [neurobin/shc](https://github.com/neurobin/shc) repository.
 
 ---
@@ -215,6 +214,4 @@ Huge thanks to the original author and the contributors of the [neurobin/shc](ht
 2. [Web Page](https://alsyundawy.github.io/shc)
 
 ---
-<div align="center">
-  <b>Developed with ❤️ & Passion by Open Source Community</b>
-</div>
+Developed with ❤️ & Passion by Open Source Community
