@@ -17,3 +17,4 @@ config.status
 a.out
 *.x
 *.x.c
+.DS_Store
