@@ -3,39 +3,30 @@
 # shellcheck disable=SC2016,SC2028
 
 set -Eeuo pipefail
-
-# Gunakan IFS yang aman
 IFS=$'\n\t'
 
 shells=('/bin/sh' '/bin/dash' '/bin/bash' '/bin/ksh' '/bin/zsh' '/usr/bin/tcsh' '/bin/csh' '/usr/bin/rc' '/usr/bin/python' '/usr/bin/python2' '/usr/bin/python3' '/usr/bin/perl')
-
 check_opts=('' '-r' '-v' '-D' '-S' '-P' '-p' '-H' '-2')
 
 shc="${1:-shc}"
 
-txtred='\e[0;31m' # Red
-txtgrn='\e[0;32m' # Green
-txtrst='\e[0m'    # Text Reset
+txtred='\e[0;31m'
+txtgrn='\e[0;32m'
+txtrst='\e[0m'
 
 stat=0
 pc=0
 fc=0
 
-# Validasi environment SKIP
 SKIP="${SKIP:-}"
 SKIP=",${SKIP},ash,"
-
-# Validasi environment SKIP_OPTS (skip specific shc options, e.g. SKIP_OPTS=-H)
 SKIP_OPTS=",${SKIP_OPTS:-},"
-
-# Variabel penampung tmp dir untuk dibersihkan oleh trap
 ACTIVE_TMPD=""
 
-# shellcheck disable=SC2329 # Fungsi ini dipanggil melalui trap, bukan langsung
+# shellcheck disable=SC2329 # Called through trap.
 cleanup() {
     local exit_code=$?
     if [[ -n "${ACTIVE_TMPD}" && -d "${ACTIVE_TMPD}" ]]; then
-        # Bersihkan hanya jika exit karena interupsi, bukan karena failure test (stat=1 dipertahankan untuk debug)
         if [[ $exit_code -ne 0 && "${stat}" -eq 0 ]]; then
             rm -rf "${ACTIVE_TMPD}" || true
         fi
@@ -48,14 +39,14 @@ echo
 echo "== Running tests ... (Skip expression: $SKIP)"
 for shell in "${shells[@]}"; do
     BASESHELL="${shell##*/}"
-    
+
     if [[ "${SKIP#*,"${BASESHELL}",}" != "$SKIP" ]] ; then
         echo    "===================================================="
         printf "=== %-20s :SKIPPED\n" "$shell"
         echo    "===================================================="
         continue
     fi
-    
+
     if [[ ! -x "$shell" ]] ; then
         echo    "===================================================="
         printf "=== %-20s :%bMISSING%b\n" "$shell" "${txtred}" "${txtrst}"
@@ -64,10 +55,9 @@ for shell in "${shells[@]}"; do
         stat=1
         continue
     fi
-    
+
     for opt in "${check_opts[@]}"; do
-        # Skip this option if it appears in SKIP_OPTS
-        if [[ "${SKIP_OPTS#*,"${opt}",}" != "${SKIP_OPTS}" ]] ; then
+        if [[ -n "${opt}" && "${SKIP_OPTS#*,"${opt}",}" != "${SKIP_OPTS}" ]] ; then
             echo    "===================================================="
             printf "=== %-20s [with shc %-2s]: SKIPPED (SKIP_OPTS)\n" "$shell" "$opt"
             echo    "===================================================="
@@ -76,15 +66,13 @@ for shell in "${shells[@]}"; do
 
         if [[ "${opt}" == "-H" ]] ; then
             if [[ "${shell#*sh}" == "$shell" ]] ; then
-                # Only supported for "bourne shell"
                 continue
             fi
         fi
-        
-        # Aman menggunakan mktemp dengan prefix XXXXXX
+
         tmpd=$(mktemp -d "${TMPDIR:-/tmp}/shc.${BASESHELL}${opt}.XXXXXX")
         ACTIVE_TMPD="$tmpd"
-        
+
         tmpf="$tmpd/test.${BASESHELL}"
         tmpa="$tmpd/a.out.${BASESHELL}$opt"
         tmpl="$tmpd/a.log"
@@ -109,7 +97,6 @@ for shell in "${shells[@]}"; do
 
         default_echo="${shell}: Hello World${sn_echo}${args_echo}"
         expected="${shell}: Hello World${sn_expected}${args_expected}"
-
         arg_only_echo="${shell}: Hello World${args_echo}"
         arg_only_expected="${shell}: Hello World${args_expected}"
 
@@ -148,8 +135,8 @@ for shell in "${shells[@]}"; do
                 echo 'echo "'"${default_echo}"'"'
             fi
         } > "$tmpf"
-        
-        # shellcheck disable=SC2086
+
+        # shellcheck disable=SC2086 # Intentionally split shc option variable.
         if ! "$shc" $opt -f "$tmpf" -o "$tmpa"; then
             out="COMPILATION_FAILED"
         elif [[ "$opt" == "-D" ]] ; then
@@ -157,7 +144,7 @@ for shell in "${shells[@]}"; do
         else
             out=$("$tmpa" "$firstarg" "$secondarg" 2>&1 || true)
         fi
-        
+
         if [[ "$out" == "$expected" ]]; then
             echo    "===================================================="
             printf "=== %-20s [with shc %-2s]: %bPASSED%b\n" "$shell" "$opt" "${txtgrn}" "${txtrst}"

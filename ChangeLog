@@ -1,6 +1,23 @@
 # CHANGES - Audit & Hardening by HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+LATEST MON Jun 15 23:58:40 WIB 2026 -  HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
-LATEST MON Jun 15 22:16:33 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+	* src/shc.c: Bump hardened audit version to 4.0.4.
+	* src/shc.c: Harden generated -P/-p pipe runtime by replacing predictable
+	  /tmp FIFO names with mkdtemp(3)-backed private temporary directories.
+	* src/shc.c: Add generated runtime PATH_MAX fallback and feature macro
+	  guards for mkdtemp(3), putenv(3), setenv(3), and strict builds.
+	* src/shc.c: Replace fixed 256-byte generated pipe command buffer with
+	  dynamically sized snprintf(NULL, 0, ...) allocation to prevent truncation.
+	* src/shc.c: Check FIFO writer open(2), close descriptors, unlink FIFO, and
+	  remove private temp directory after pipe delivery.
+	* test/ttest.sh: Fix SKIP_OPTS parsing so an empty option is not skipped
+	  accidentally when SKIP_OPTS is unset.
+	* configure.ac: Synchronize package version to 4.0.4-Hardened-Audit-2026
+	  and declare newly used headers/functions.
+	* src/Makefile.am: Add stricter warning flags for normal maintainer builds.
+
+
+MON Jun 15 22:16:33 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
     * Sec:  Replaced unsafe shell-command build execution with fork() + execvp() argv vectors for compiler and strip paths.
     * Sec:  Replaced external chmod command with chmod(2) to avoid shell expansion and command parsing exposure.
@@ -14,7 +31,7 @@ LATEST MON Jun 15 22:16:33 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTI
     * Perf: Removed runtime helper compilation overhead from -H execution path.
     * Doc:  Updated ChangeLog and README change notes by adding entries in the existing project format only.
 
-LATEST MON Jun 15 19:52:11 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+MON Jun 15 19:52:11 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
     * Feat: Added absolute out-of-the-box compiler support for modern & legacy shells: ksh88, ksh93, mksh, pdksh, fish, nu, pwsh, powershell, yash, osh, elvish.
     * Feat: Added global compatibility support for #!/usr/bin/env wrapper interpretation with complex parameter chaining.

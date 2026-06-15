@@ -135,6 +135,18 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 
 > **By HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION**
 
+### 🌟 LATEST: MON Jun 15 23:58:40 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+
+- **Sec**: Hardened generated `-P`/`-p` pipe mode by replacing predictable `/tmp/%08x` FIFO names with `mkdtemp(3)` private temporary directories.
+- **Sec**: Added strict FIFO writer error handling: checked `open(2)`, closed the descriptor, unlinked the FIFO, and removed the private temp directory.
+- **Fix**: Fixed `test/ttest.sh` `SKIP_OPTS` logic so the default empty option is not skipped accidentally when `SKIP_OPTS` is unset.
+- **Fix**: Replaced generated fixed-size `char cmd[256]` pipe command formatting with dynamically sized `snprintf(NULL, 0, ...)` allocation to avoid silent truncation.
+- **Qual**: Added generated runtime feature macro guards and `PATH_MAX` fallback for stricter compiler/libc compatibility.
+- **Qual**: Synchronized `configure.ac` and internal source version to `4.0.4-Hardened-Audit-2026`.
+- **Qual**: Strengthened maintainer compile flags in `src/Makefile.am` with `-Wpedantic` and `-Wformat=2`.
+
+*Original Credit to [@alsyundawy](https://github.com/alsyundawy)*
+
 ### 🌟 LATEST: MON Jun 15 22:16:33 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
 - **Sec**: Replaced unsafe shell-command build execution with `fork()` + `execvp()` argv vectors for compiler and strip paths.

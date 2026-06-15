@@ -1,5 +1,5 @@
 AM_CPPFLAGS = -D_POSIX_C_SOURCE=200809L
-AM_CFLAGS = -Wall -Wextra
+AM_CFLAGS = -Wall -Wextra -Wpedantic -Wformat=2
 
 bin_PROGRAMS = shc
 shc_SOURCES = shc.c
