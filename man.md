@@ -1,6 +1,6 @@
 % shc(1) shc user manual
 %
-% August 19, 2024
+% June 15, 2026
 <hr>
 
 # NAME
@@ -21,8 +21,9 @@ The message **Please contact your provider** will be displayed instead. This mes
 
 You can compile any kind of shell script, but you need to supply valid `-i`, `-x` and `-l` options.
 
-The compiled binary will still require the shell specified in the first line of the shell code (i.e. `#!/bin/sh`) to be available on the system,
-therefore **shc** does not create completely independent binaries, it mainly obfuscates the source script.
+The compiled binary will still require the shell specified in the first line of the shell code (i.e. `#!/bin/sh` or `#!/usr/bin/env bash`) to be available on the system.
+It now includes absolute out-of-the-box compiler support for modern and legacy shells (ksh88, ksh93, mksh, pdksh, fish, nu, pwsh, powershell, yash, osh, elvish) as well as global compatibility support for `env` wrapper interpretation with complex parameter chaining.
+Therefore **shc** does not create completely independent binaries, it mainly obfuscates the source script.
 
 **shc** itself is not a compiler such as cc, it rather encodes and encrypts a shell script and generates C source code with the added expiration capability. 
 It then uses the system compiler to compile a stripped binary which behaves exactly like the original script.
@@ -135,10 +136,11 @@ The maximum size of the script that could be executed once compiled is limited b
 
 # MAIN AUTHORS
 
+HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION (Audit & Hardening 2026)
 Francisco Rosales <frosal@fi.upm.es>
 Md Jahidul Hamid <jahidulhamid@yahoo.com>
 
-Note: Do not contact them, they are no longer actively involved
+Note: Do not contact the original authors, they are no longer actively involved
 
 # REPORT BUGS TO
-https://github.com/neurobin/shc/issues 
+https://github.com/alsyundawy/shc/issues 
