@@ -153,6 +153,7 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 - **Feat**: Bumped internal version tag explicitly to `'4.0.3 (Hardened Audit Edition - 15 Jun 2026)'`.
 - **Qual**: Synchronized Autotools `configure.ac` to version `4.0.3-Hardened-Audit-2026`.
 - **Qual**: Fixed massive Markdown linting errors (MD041, MD012, MD010) across ChangeLog and README.md.
+- **Fix**: Fixed double-percent formatting escape bug in `shc.c` causing `sh: 1: %s: not found` error during `-H` hardened compilation.
 
 *Original Credit to [@alsyundawy](https://github.com/alsyundawy)*
 

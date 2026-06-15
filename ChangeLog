@@ -18,6 +18,7 @@ LATEST MON Jun 15 19:52:11 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTI
     * Feat: Bumped internal version tag explicitly to '4.0.3 (Hardened Audit Edition - 15 Jun 2026)'.
     * Qual: Synchronized Autotools configure.ac to version 4.0.3-Hardened-Audit-2026.
     * Qual: Fixed massive Markdown linting errors (MD041, MD012, MD010) across ChangeLog and README.md.
+    * Fix:  Fixed double-percent formatting escape bug in shc.c causing 'sh: 1: %s: not found' error during -H hardened compilation.
 
 LATEST Aug 19 2024
 
