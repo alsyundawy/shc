@@ -40,9 +40,14 @@
 
 ### 🛠️ Building & Installing Locally
 
-First, ensure you have the necessary packages for compiling:
+First, clone the repository and ensure you have the necessary packages for compiling:
 
 ```bash
+# Clone the repository
+git clone https://github.com/alsyundawy/shc.git
+cd shc
+
+# Install dependencies
 sudo apt-get update
 sudo apt-get install build-essential automake autoconf libtool
 ```
