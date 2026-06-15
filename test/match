@@ -1,25 +1,29 @@
-#!/bin/sh
+#!/usr/bin/env sh
+# Audit & Hardening by HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION (2026)
 #
 # File search script by <workexp@csc.liv.ac.uk>
 # Usage: match [Filename]
 #
-IFS=":$IFS"
 
-for substring in "$@"
-do
-    for path in $PATH
-    do
-        for command in "$path/"*"$substring"*
-        do
-            if [ -f "$command" ]
-            then
-                echo "$command"
+set -eu
+
+for substring in "$@"; do
+    OLD_IFS="$IFS"
+    IFS=":"
+    # shellcheck disable=SC2086 # Splitting $PATH intentionally
+    for path in $PATH; do
+        IFS="$OLD_IFS"
+        for command in "${path}/"*"${substring}"*; do
+            if [ -f "$command" ]; then
+                printf "%s\n" "$command"
             fi
         done
+        IFS=":"
     done
+    IFS="$OLD_IFS"
 done
 
 # Added
-echo "[$$] PAUSED... Hit return!"
-# shellcheck disable=2162,2034
-read DUMMY
+printf "[%s] PAUSED... Hit return!\n" "$$"
+# shellcheck disable=SC2034
+read -r DUMMY

@@ -1,11 +1,17 @@
-#!/bin/bash
-# shellcheck disable=2016,2028
+#!/usr/bin/env bash
+# Audit & Hardening by HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION (2026)
+# shellcheck disable=SC2016,SC2028
+
+set -Eeuo pipefail
+
+# Gunakan IFS yang aman
+IFS=$'\n\t'
+
 shells=('/bin/sh' '/bin/dash' '/bin/bash' '/bin/ksh' '/bin/zsh' '/usr/bin/tcsh' '/bin/csh' '/usr/bin/rc' '/usr/bin/python' '/usr/bin/python2' '/usr/bin/python3' '/usr/bin/perl')
-## Install: sudo apt install dash bash ksh zsh tcsh csh rc
 
 check_opts=('' '-r' '-v' '-D' '-S' '-P' '-p' '-H' '-2')
 
-shc=${1-shc}
+shc="${1:-shc}"
 
 txtred='\e[0;31m' # Red
 txtgrn='\e[0;32m' # Green
@@ -14,58 +20,80 @@ txtrst='\e[0m'    # Text Reset
 stat=0
 pc=0
 fc=0
-# Comma separated list of shells that are skipped
+
+# Validasi environment SKIP
+SKIP="${SKIP:-}"
 SKIP=",${SKIP},ash,"
+
+# Variabel penampung tmp dir untuk dibersihkan oleh trap
+ACTIVE_TMPD=""
+
+# shellcheck disable=SC2329 # Fungsi ini dipanggil melalui trap, bukan langsung
+cleanup() {
+    local exit_code=$?
+    if [[ -n "${ACTIVE_TMPD}" && -d "${ACTIVE_TMPD}" ]]; then
+        # Bersihkan hanya jika exit karena interupsi, bukan karena failure test (stat=1 dipertahankan untuk debug)
+        if [[ $exit_code -ne 0 && "${stat}" -eq 0 ]]; then
+            rm -rf "${ACTIVE_TMPD}" || true
+        fi
+    fi
+    exit "$exit_code"
+}
+trap cleanup EXIT INT TERM
+
 echo
 echo "== Running tests ... (Skip expression: $SKIP)"
 for shell in "${shells[@]}"; do
-    BASESHELL=${shell##*/}
-    if [ "${SKIP#*,"${BASESHELL}",}" != "$SKIP" ] ; then
+    BASESHELL="${shell##*/}"
+    
+    if [[ "${SKIP#*,"${BASESHELL}",}" != "$SKIP" ]] ; then
         echo    "===================================================="
-        echo -e "=== $shell                :SKIPPED"
+        printf "=== %-20s :SKIPPED\n" "$shell"
         echo    "===================================================="
         continue
     fi
-    if [ ! -x "$shell" ] ; then
+    
+    if [[ ! -x "$shell" ]] ; then
         echo    "===================================================="
-        echo -e "=== $shell                :${txtred}MISSING${txtrst}"
+        printf "=== %-20s :%bMISSING%b\n" "$shell" "${txtred}" "${txtrst}"
         echo    "===================================================="
-        ((fc++))
+        fc=$((fc + 1))
         stat=1
         continue
     fi
+    
     for opt in "${check_opts[@]}"; do
-        if [ "${opt}" = "-H" ] ; then
-            if [ "${shell#*sh}" = "$shell" ] ; then
+        if [[ "${opt}" == "-H" ]] ; then
+            if [[ "${shell#*sh}" == "$shell" ]] ; then
                 # Only supported for "bourne shell"
                 continue
             fi
         fi
-        tmpd=$(mktemp -d "/tmp/shc.${BASESHELL}${opt}.XXX.tst")
-        tmpf="$tmpd/test.$(basename "$shell")"
+        
+        # Aman menggunakan mktemp dengan prefix XXXXXX
+        tmpd=$(mktemp -d "${TMPDIR:-/tmp}/shc.${BASESHELL}${opt}.XXXXXX")
+        ACTIVE_TMPD="$tmpd"
+        
+        tmpf="$tmpd/test.${BASESHELL}"
         tmpa="$tmpd/a.out.${BASESHELL}$opt"
         tmpl="$tmpd/a.log"
         out=""
         firstarg='first quote" and space'
         secondarg="secondWithSingleQuote'"
 
-        # Default values for echo/print and expectations
         args_echo=' fp:(1) sp:(2)'
         args_expected=" fp:${firstarg} sp:${secondarg}"
         sn_echo=' sn:(0)'
         sn_expected=" sn:${tmpa}"
 
-        # Modify defaults according to test/skip test
-        if [ "${opt}" = "-H" ] ; then
-            # -H does not support arguments
-            args_echo=
-            args_expected=
-            sn_echo=
-            sn_expected=
-        elif [ "${opt}" = "-p" ] ; then
-            # -p does not suppose $0 support
-            sn_echo=
-            sn_expected=
+        if [[ "${opt}" == "-H" ]] ; then
+            args_echo=""
+            args_expected=""
+            sn_echo=""
+            sn_expected=""
+        elif [[ "${opt}" == "-p" ]] ; then
+            sn_echo=""
+            sn_expected=""
         fi
 
         default_echo="${shell}: Hello World${sn_echo}${args_echo}"
@@ -75,72 +103,68 @@ for shell in "${shells[@]}"; do
         arg_only_expected="${shell}: Hello World${args_expected}"
 
         {
-            echo '#!'"$shell"
-            if [ "${shell#*/pyth}" != "$shell" ] ; then
-                # Python
-                default_echo="${default_echo//\(/\{}"  # Use % to indicate arg
-                default_echo="${default_echo//)/\}}"    # No end parentheses
+            echo "#!$shell"
+            if [[ "${shell#*/pyth}" != "$shell" ]] ; then
+                default_echo="${default_echo//\(/\{}"
+                default_echo="${default_echo//)/\}}"
                 echo 'import sys; sys.stdout.write("'"${default_echo}"'".format(*sys.argv)+"\n")'
-            elif [ "$BASESHELL" = "rc" ] ; then
-                default_echo="${default_echo//\(/\$}"  # Use $ to indicate arg
-                default_echo="${default_echo//)/}"    # No end parentheses
-                arg_only_echo="${arg_only_echo//\(/\$}"  # Use $ to indicate arg
-                arg_only_echo="${arg_only_echo//)/}"    # No end parentheses
-                # rc
-                if [ "$opt" != "-P" ] ; then
+            elif [[ "$BASESHELL" == "rc" ]] ; then
+                default_echo="${default_echo//\(/\$}"
+                default_echo="${default_echo//)/}"
+                arg_only_echo="${arg_only_echo//\(/\$}"
+                arg_only_echo="${arg_only_echo//)/}"
+                if [[ "$opt" != "-P" ]] ; then
                     echo "echo ${default_echo}"
                 else
                     echo "echo ${arg_only_echo}"
                     expected="${arg_only_expected}"
                 fi
-            elif [ "${shell#*/perl}" != "$shell" ] ; then
-                # perl
-                default_echo="${default_echo//\(/\$ARGV\[}"  # Use $ARGV[ to indicate arg
-                default_echo="${default_echo//)/\]}"         # Place ] after arg index
-                default_echo="${default_echo//\$ARGV\[0\]/\$0}"  # $0 for first argument
-                default_echo="${default_echo//1/0}"  # Argument shift
-                default_echo="${default_echo//2/1}"  # Argument shift
+            elif [[ "${shell#*/perl}" != "$shell" ]] ; then
+                default_echo="${default_echo//\(/\$ARGV\[}"
+                default_echo="${default_echo//)/\]}"
+                default_echo="${default_echo//\$ARGV\[0\]/\$0}"
+                default_echo="${default_echo//1/0}"
+                default_echo="${default_echo//2/1}"
                 echo 'print "'"${default_echo}"'";'
-            elif [ "${shell#*/csh}" != "$shell" ] ; then
-                # csh - can not forge $0
-                arg_only_echo="${arg_only_echo//\(/\$}"  # Use $ to indicate arg
-                arg_only_echo="${arg_only_echo//)/}"    # No end parentheses
+            elif [[ "${shell#*/csh}" != "$shell" ]] ; then
+                arg_only_echo="${arg_only_echo//\(/\$}"
+                arg_only_echo="${arg_only_echo//)/}"
                 echo 'echo "'"${arg_only_echo}"'"'
                 expected="${arg_only_expected}"
             else
-                default_echo=${default_echo//\(/\$}  # Use $ to indicate arg
-                default_echo="${default_echo//)/}"    # No end parentheses
+                default_echo="${default_echo//\(/\$}"
+                default_echo="${default_echo//)/}"
                 echo 'echo "'"${default_echo}"'"'
             fi
         } > "$tmpf"
+        
         # shellcheck disable=SC2086
-        "$shc" $opt -f "$tmpf" -o "$tmpa"
-        # ls -la "$tmpa"
-
-        if [ "$opt" = "-D" ] ; then
-            # Hide debug output
-            out=$("$tmpa" "$firstarg" "$secondarg" 2>/dev/null)
-            # TODO: compare dbg output
-            # outdbg=$("$tmpa" first second 2>1)
+        if ! "$shc" $opt -f "$tmpf" -o "$tmpa"; then
+            out="COMPILATION_FAILED"
+        elif [[ "$opt" == "-D" ]] ; then
+            out=$("$tmpa" "$firstarg" "$secondarg" 2>/dev/null || true)
         else
-            out=$("$tmpa" "$firstarg" "$secondarg" 2>&1)
+            out=$("$tmpa" "$firstarg" "$secondarg" 2>&1 || true)
         fi
-        if [[ "$out" = "$expected" ]]; then
+        
+        if [[ "$out" == "$expected" ]]; then
             echo    "===================================================="
-            echo -e "=== $shell [with shc $opt]: ${txtgrn}PASSED${txtrst}"
+            printf "=== %-20s [with shc %-2s]: %bPASSED%b\n" "$shell" "$opt" "${txtgrn}" "${txtrst}"
             echo    "===================================================="
-            ((pc++))
+            pc=$((pc + 1))
             rm -rf "$tmpd"
+            ACTIVE_TMPD=""
         else
             echo    "===================================================="
-            echo -e "=== $shell [with shc $opt]: ${txtred}FAILED${txtrst}"
+            printf "=== %-20s [with shc %-2s]: %bFAILED%b\n" "$shell" "$opt" "${txtred}" "${txtrst}"
             echo    "===================================================="
             echo "  Files kept in '$tmpd'"
             printf "*** Expected Output:\n%s\n" "$expected"
             printf "*** Output:\n%s\n*** End of output\n" "$out"
             echo "$out" > "$tmpl"
             stat=1
-            ((fc++))
+            fc=$((fc + 1))
+            ACTIVE_TMPD=""
         fi
     done
 done
@@ -149,24 +173,25 @@ echo
 echo "Test Summary"
 echo "------------"
 
-if ((pc>0)); then
+if (( pc > 0 )); then
     pt="${txtgrn}PASSED${txtrst}"
 else
     pt="PASSED"
 fi
 
-if ((fc>0)); then
+if (( fc > 0 )); then
     ft="${txtred}FAILED${txtrst}"
 else
     ft="FAILED"
 fi
 
-echo -e "$pt: $pc"
-echo -e "$ft: $fc"
+printf "%b: %d\n" "$pt" "$pc"
+printf "%b: %d\n" "$ft" "$fc"
 echo "------------"
 echo
 
-if ((stat>0)); then
+if (( stat > 0 )); then
     echo "EXIT with code $stat"
 fi
-exit $stat
+
+exit "$stat"

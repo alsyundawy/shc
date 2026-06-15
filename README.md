@@ -1,9 +1,9 @@
+# Shell Script Compiler
+
 [![build status image](https://travis-ci.org/neurobin/shc.svg?branch=release)](https://travis-ci.org/neurobin/shc)
 [![GitHub stars](https://img.shields.io/github/stars/neurobin/shc.svg)](https://github.com/neurobin/shc/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/neurobin/shc.svg)](https://github.com/neurobin/shc/network)
 [![GitHub issues](https://img.shields.io/github/issues/neurobin/shc.svg)](https://github.com/neurobin/shc/issues)
-
-# Shell Script Compiler
 
 A generic shell script compiler. Shc takes a script, which is specified on the command line and produces C source code. The generated source code is then compiled and linked to produce a stripped binary executable.
 
@@ -62,15 +62,14 @@ make
 make test
 ```
 
-Temporary directories are generally created in `/tmp/shc.SHELL.OPT.XXX.tst` (caps are replaced according to test).
+Temporary directories are generally created in `${TMPDIR:-/tmp}/shc.SHELL.OPT.XXXXXX` (caps are replaced according to test).
 When a test succeeds, the directory is removed, if not, it is kept to help with debugging.
 
 Clean up test outputs manually with:
 
 ```bash
-rm /tmp/shc.*.tst
+rm -rf ${TMPDIR:-/tmp}/shc.*
 ```
-
 
 ## Known limitations
 
@@ -79,7 +78,6 @@ length of the arguments to the exec function.
   With standard options this limits the maximum length of the runnable script of shc.
   However, you can now use the `-P` options which uses a pipe which circumvents this limitation.
 
-
 !! - CHECK YOUR RESULTS CAREFULLY BEFORE USING - !!
 
 ## Links
@@ -87,7 +85,7 @@ length of the arguments to the exec function.
 1. [Man Page](https://neurobin.github.io/shc/man.html)
 2. [Web Page](https://neurobin.github.io/shc)
 
-# Contributing
+## Contributing
 
 If you want to make pull requests, please do so against the **master** branch. The default branch is **release** which should contain clean package files ready to be used.
 

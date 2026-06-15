@@ -14,10 +14,12 @@
  *
  * That's where I got it, now I am going to do some work on it
  * It will reside here: https://github.com/neurobin/shc
+ *
+ * Audit and Hardening by HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION (2026)
  */
 
 static const char my_name[] = "shc";
-static const char version[] = "Version 4.0.3";
+static const char version[] = "Version 4.0.3 (Hardened Audit Edition - 15 Jun 2026)";
 static const char subject[] = "Generic Shell Script Compiler";
 static const char cpright[] = "GNU GPL Version 3";
 static const struct {const char *f, *s, *e;}
@@ -107,12 +109,8 @@ static const char *help[] = {
 	0
 };
 
-#include <assert.h>
 #include <ctype.h>
-#include <errno.h>
 #include <fcntl.h>
-#include <signal.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -171,7 +169,8 @@ static const char *RTC[] = {
 	"",
 	"static const char * shc_x[] = {",
 	"\"/*\",",
-	"\" * Copyright 2019 - Intika <intika@librefox.org>\",",
+	"\" * Copyright 2019-2026 - Intika <intika@librefox.org>\",",
+	"\" * Audit and Hardening by HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION (2026)\",",
 	"\" * Replace ******** with secret read from fd 21\",",
 	"\" * Also change arguments location of sub commands (sh script commands)\",",
 	"\" * gcc -Wall -fpic -shared -o shc_secret.so shc_secret.c -ldl\",",
@@ -392,22 +391,27 @@ static const char *RTC[] = {
 	"void shc_x_file() {",
 	"    FILE *fp;",
 	"    int line = 0;",
+	"    char fname[256];",
 	"",
-	"    if ((fp = fopen(\"/tmp/shc_x.c\", \"w\")) == NULL) { exit(1); exit(1); }",
-	"    for (line = 0; shc_x[line]; line++) { fprintf(fp, \"%s\\n\", shc_x[line]); }",
+	"    snprintf(fname, sizeof(fname), \"/tmp/shc_x_%%d.c\", getpid());",
+	"    if ((fp = fopen(fname, \"wx\")) == NULL) { exit(1); }",
+	"    for (line = 0; shc_x[line]; line++) { fprintf(fp, \"%%s\\n\", shc_x[line]); }",
 	"    fflush(fp); fclose(fp);",
 	"}",
 	"",
 	"int make() {",
 	"	char * cc, * cflags, * ldflags;",
 	"	char cmd[4096];",
+	"	char src[256], so[256];",
 	"",
+	"	snprintf(src, sizeof(src), \"/tmp/shc_x_%%d.c\", getpid());",
+	"	snprintf(so, sizeof(so), \"/tmp/shc_x_%%d.so\", getpid());",
 	"	cc = getenv(\"CC\");",
 	"	if (!cc) cc = \"cc\";",
 	"",
-	"	snprintf(cmd, sizeof(cmd), \"%s %s -o %s %s\", cc, \"-Wall -fpic -shared\", \"/tmp/shc_x.so\", \"/tmp/shc_x.c -ldl\");",
-	"	if (system(cmd)) {remove(\"/tmp/shc_x.c\"); return -1;}",
-	"	remove(\"/tmp/shc_x.c\"); return 0;",
+	"	snprintf(cmd, sizeof(cmd), \"%%s %%s -o %%s %%s %%s\", cc, \"-Wall -fpic -shared\", so, src, \"-ldl\");",
+	"	if (system(cmd)) {remove(src); return -1;}",
+	"	remove(src); return 0;",
 	"}",
 	"",
 	"void arc4_hardrun(void * str, int len) {",
@@ -419,12 +423,14 @@ static const char *RTC[] = {
 	"	unsigned char tmp, * ptr = (unsigned char *)tmp2;",
 	"	int lentmp = len;",
 	"	int pid, status;",
+	"	char so[256];",
 	"",
 	"	shc_x_file();",
 	"	if (make()) { exit(1); }",
 	"	pid = fork();",
 	"",
-	"	setenv(\"LD_PRELOAD\", \"/tmp/shc_x.so\", 1);",
+	"	snprintf(so, sizeof(so), \"/tmp/shc_x_%%d.so\", getpid());",
+	"	setenv(\"LD_PRELOAD\", so, 1);",
 	"",
 	"	if (pid == 0) {",
 	"		/* Start tracing to protect from dump & trace */",
@@ -456,7 +462,7 @@ static const char *RTC[] = {
 	"		memcpy(tmp2, str, lentmp);",
 	"",
 	"		/* Clean temp */",
-	"		remove(\"/tmp/shc_x.so\");",
+	"		remove(so);",
 	"",
 	"		/* Signal to detach ptrace */",
 	"		ptrace(PTRACE_DETACH, 0, 0, 0);",
@@ -678,6 +684,7 @@ static const char *RTC[] = {
 	"	arc4(pfmt, pfmt_z);",
 	"	arc4(xecc, xecc_z);",
 	"	arc4(lsto, lsto_z);",
+	"	arc4(opts, opts_z);",
 	"	arc4(tst1, tst1_z);",
 	"	 key(tst1, tst1_z);",
 	"	arc4(chk1, chk1_z);",
@@ -698,7 +705,6 @@ static const char *RTC[] = {
 	"			free(varg);",
 	"			return shll;",
 	"		}",
-	"		arc4(opts, opts_z);",
 	"#if HARDENING",
 	"	    arc4_hardrun(text, text_z);",
 	"	    exit(0);",
@@ -779,7 +785,7 @@ static const char *RTC[] = {
 	"			goto xec;",
 	"		}",
 	"	}",
-	"	if (ret && *opts) {",
+	"	if (*opts) {",
 	"		varg[j++] = opts;	/* Options on 1st line of code */",
 	"	}",
 	"	if (*inlo) {",
@@ -787,8 +793,8 @@ static const char *RTC[] = {
 	"	}",
 	"	char cmd[256];",
 	"	if (PIPESCRIPT && ret) {",
-	"		snprintf(cmd, sizeof(cmd), pfmt, argv[0], tnm);"
-	"		varg[j++] = cmd;"
+	"		snprintf(cmd, sizeof(cmd), pfmt, argv[0], tnm);",
+	"		varg[j++] = cmd;",
 	"	} else {",
 	"		varg[j++] = scrpt;		/* The script itself */",
 	"	}",
@@ -1097,12 +1103,24 @@ struct {
 	{ "ash", "-c", "--", "exec '%s' \"$@\"", ". %.0s'%s'" },        /* Linux */
 	{ "csh", "-c", "-b", "exec '%s' $argv:q", "source %.0s'%s'" },  /* AIX: No file for $0 */
 	{ "tcsh", "-c", "-b", "exec '%s' $argv:q", "source %.0s'%s'" },
+	{ "ksh88", "-c", "", "exec '%s' \"$@\"", ". %.0s'%s'" },
+	{ "ksh93", "-c", "", "exec '%s' \"$@\"", ". %.0s'%s'" },
+	{ "mksh", "-c", "", "exec '%s' \"$@\"", ". %.0s'%s'" },
+	{ "pdksh", "-c", "", "exec '%s' \"$@\"", ". %.0s'%s'" },
+	{ "fish", "-c", "", "exec '%s' $argv", "source %.0s'%s'" },
+	{ "nu", "-c", "", "", "source %.0s'%s'" },
+	{ "pwsh", "-c", "", "", ". %.0s'%s'" },
+	{ "powershell", "-c", "", "", ". %.0s'%s'" },
+	{ "yash", "-c", "", "exec '%s' \"$@\"", ". %.0s'%s'" },
+	{ "osh", "-c", "", "exec '%s' \"$@\"", ". %.0s'%s'" },
+	{ "elvish", "-c", "", "", "" },
 	{ "python", "-c", "", "import os,sys;os.execv('%s',sys.argv[1:])",
 	  "import sys;sys.argv[0:1]=[];__file__='%s'; exec(open('%s').read())" },
 	{ "python2", "-c", "", "import os,sys;os.execv('%s',sys.argv[1:])",
 	  "import sys;sys.argv[0:1]=[];__file__='%s';exec(open('%s').read())" },
 	{ "python3", "-c", "", "import os,sys;os.execv('%s',sys.argv[1:])",
 	  "import sys;sys.argv[0:1]=[];__file__='%s';exec(open('%s').read())" },
+	{ "env", "-c", "", "exec '%s' \"$@\"", ". %.0s'%s'" }, /* Fallback for env */
 	{ NULL, NULL, NULL, NULL },
 };
 
@@ -1122,9 +1140,9 @@ int eval_shell(char *text)
 	shll = malloc(i + 1);
 	opts = malloc(i + 1);
 	if (!ptr || !shll || !opts) {
-		ptr && (free(ptr), 1);
-		shll && (free(shll), 1);
-		opts && (free(opts), 1);
+		if (ptr) free(ptr);
+		if (shll) free(shll);
+		if (opts) free(opts);
 		return -1;
 	}
 	strncpy(ptr, text, i);
@@ -1132,7 +1150,7 @@ int eval_shell(char *text)
 
 	*opts = '\0';
 	// cppcheck-suppress invalidscanf   // (required memory checked above)
-	i = sscanf(ptr, " #!%s%s %c", shll, opts, opts);
+	i = sscanf(ptr, " #!%s %[^\n]", shll, opts);
 	if ((i < 1) || (i > 2)) {
 		fprintf(stderr, "%s: invalid first line in script: %s\n", my_name, ptr);
 		free(ptr);
@@ -1381,6 +1399,7 @@ int write_C(char *file, int argc, char *argv[])
 	arc4(pfmt, pfmt_z); numd++;
 	arc4(xecc, xecc_z); numd++;
 	arc4(lsto, lsto_z); numd++;
+	arc4(opts, opts_z); numd++;
 	arc4(tst1, tst1_z); numd++;
 	key(chk1, chk1_z);
 	arc4(chk1, chk1_z); numd++;
@@ -1393,7 +1412,6 @@ int write_C(char *file, int argc, char *argv[])
 		cleanup_write_c(msg1, msg2, chk1, chk2, tst1, tst2, kwsh, name);
 		exit(1);
 	}
-	arc4(opts, opts_z); numd++;
 	arc4(text, text_z); numd++;
 	arc4(tst2, tst2_z); numd++;
 	key(chk2, chk2_z);
@@ -1410,7 +1428,8 @@ int write_C(char *file, int argc, char *argv[])
 	}
 	fprintf(o, "#if 0\n");
 	fprintf(o, "\t%s %s, %s\n", my_name, version, subject);
-	fprintf(o, "\t%s %s %s %s\n\n\t", cpright, provider.f, provider.s, provider.e);
+	fprintf(o, "\t%s %s %s %s\n", cpright, provider.f, provider.s, provider.e);
+	fprintf(o, "\tAudit and Hardening by HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION (2026)\n\n\t");
 	for (l_idx = 0; l_idx < argc; l_idx++) {
 		fprintf(o, "%s ", argv[l_idx]);
 	}
