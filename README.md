@@ -197,6 +197,13 @@ If you change anything related to `autotools`, `./autogen.sh` should be run to r
 
 ---
 
+## 🏆 Credits & Acknowledgements
+
+This project is a hardened and heavily audited iteration built upon the incredible foundational work of **[neurobin](https://github.com/neurobin)**. 
+Huge thanks to the original author and the contributors of the [neurobin/shc](https://github.com/neurobin/shc) repository.
+
+---
+
 ## 🔗 Links
 
 1. [Man Page](https://alsyundawy.github.io/shc/man.html)
