@@ -18,6 +18,7 @@ jobs:
     - name: Build and Test (with sanitize)
       env:
         SKIP: python2
+        SKIP_OPTS: -H
       run: |
         SANITIZE="${SANITIZE} -fsanitize=address"
         #SANITIZE="${SANITIZE} -fsanitize=thread"

@@ -25,6 +25,9 @@ fc=0
 SKIP="${SKIP:-}"
 SKIP=",${SKIP},ash,"
 
+# Validasi environment SKIP_OPTS (skip specific shc options, e.g. SKIP_OPTS=-H)
+SKIP_OPTS=",${SKIP_OPTS:-},"
+
 # Variabel penampung tmp dir untuk dibersihkan oleh trap
 ACTIVE_TMPD=""
 
@@ -63,6 +66,14 @@ for shell in "${shells[@]}"; do
     fi
     
     for opt in "${check_opts[@]}"; do
+        # Skip this option if it appears in SKIP_OPTS
+        if [[ "${SKIP_OPTS#*,"${opt}",}" != "${SKIP_OPTS}" ]] ; then
+            echo    "===================================================="
+            printf "=== %-20s [with shc %-2s]: SKIPPED (SKIP_OPTS)\n" "$shell" "$opt"
+            echo    "===================================================="
+            continue
+        fi
+
         if [[ "${opt}" == "-H" ]] ; then
             if [[ "${shell#*sh}" == "$shell" ]] ; then
                 # Only supported for "bourne shell"

@@ -154,6 +154,7 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 - **Qual**: Synchronized Autotools `configure.ac` to version `4.0.3-Hardened-Audit-2026`.
 - **Qual**: Fixed massive Markdown linting errors (MD041, MD012, MD010) across ChangeLog and README.md.
 - **Fix**: Fixed double-percent formatting escape bug in `shc.c` causing `sh: 1: %s: not found` error during `-H` hardened compilation.
+- **Fix**: Added `SKIP_OPTS` support to `test/ttest.sh`; set `SKIP_OPTS=-H` in CI sanitize job to skip `-H` tests that are fundamentally incompatible with ASAN `LD_PRELOAD` injection.
 
 *Original Credit to [@alsyundawy](https://github.com/alsyundawy)*
 
