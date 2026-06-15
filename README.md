@@ -1,9 +1,9 @@
 # Shell Script Compiler
 
-[![build status image](https://travis-ci.org/neurobin/shc.svg?branch=release)](https://travis-ci.org/neurobin/shc)
-[![GitHub stars](https://img.shields.io/github/stars/neurobin/shc.svg)](https://github.com/neurobin/shc/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/neurobin/shc.svg)](https://github.com/neurobin/shc/network)
-[![GitHub issues](https://img.shields.io/github/issues/neurobin/shc.svg)](https://github.com/neurobin/shc/issues)
+[![build status image](https://travis-ci.org/alsyundawy/shc.svg?branch=release)](https://travis-ci.org/alsyundawy/shc)
+[![GitHub stars](https://img.shields.io/github/stars/alsyundawy/shc.svg)](https://github.com/alsyundawy/shc/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/alsyundawy/shc.svg)](https://github.com/alsyundawy/shc/network)
+[![GitHub issues](https://img.shields.io/github/issues/alsyundawy/shc.svg)](https://github.com/alsyundawy/shc/issues)
 
 A generic shell script compiler. Shc takes a script, which is specified on the command line and produces C source code. The generated source code is then compiled and linked to produce a stripped binary executable.
 
@@ -15,13 +15,23 @@ shc itself is not a compiler such as cc, it rather encodes and encrypts a shell 
 
 ### Building & installing locally
 
+First, install the necessary packages for compiling:
+
 ```bash
+sudo apt-get update
+sudo apt-get install build-essential automake autoconf libtool
+```
+
+Then, compile and install:
+
+```bash
+./autogen.sh
 ./configure
 make
 sudo make install
 ```
 
-**Note** If `make` fails due to *automake*'s version, run `./autogen.sh` before running the above commands.
+**Note** If `make` fails due to *automake*'s version, ensure you have run `./autogen.sh` before running the above commands.
 
 ### Debian GNU/Linux and Ubuntu systems
 
@@ -32,12 +42,12 @@ sudo apt-get install shc
 ### Ubuntu systems (via PPA repository)
 
 ```bash
-sudo add-apt-repository ppa:neurobin/ppa
+sudo add-apt-repository ppa:alsyundawy/ppa
 sudo apt-get update
 sudo apt-get install shc
 ```
 
-If the above installation method seems like too much work, then just download a compiled binary package from [release page](https://github.com/neurobin/shc/releases/latest) and copy the `shc` binary to `/usr/bin` and `shc.1` file to `/usr/share/man/man1`.
+If the above installation method seems like too much work, then just download a compiled binary package from [release page](https://github.com/alsyundawy/shc/releases/latest) and copy the `shc` binary to `/usr/bin` and `shc.1` file to `/usr/share/man/man1`.
 
 ## Usage
 
@@ -82,8 +92,8 @@ length of the arguments to the exec function.
 
 ## Links
 
-1. [Man Page](https://neurobin.github.io/shc/man.html)
-2. [Web Page](https://neurobin.github.io/shc)
+1. [Man Page](https://alsyundawy.github.io/shc/man.html)
+2. [Web Page](https://alsyundawy.github.io/shc)
 
 ## Contributing
 
