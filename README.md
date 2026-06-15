@@ -135,6 +135,22 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 
 > **By HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION**
 
+### 🌟 LATEST: MON Jun 15 22:16:33 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+
+- **Sec**: Replaced unsafe shell-command build execution with `fork()` + `execvp()` argv vectors for compiler and strip paths.
+- **Sec**: Replaced external `chmod` command with `chmod(2)` to avoid shell expansion and command parsing exposure.
+- **Sec**: Removed predictable `/tmp/shc_x_<pid>.c` and `/tmp/shc_x_<pid>.so` generation from `-H` runtime.
+- **Fix**: Fixed generated `-H` runtime buffer overflow in parent process-name reading with bounded `fread()` and explicit null termination.
+- **Fix**: Fixed `fread()` error handling in script loader so read failures are not silently treated as EOF.
+- **Fix**: Fixed unchecked allocation and overflow handling when generating output filename and expiration-message data.
+- **Qual**: Added safe argv-style parsing for `CC`, `CFLAGS`, `LDFLAGS`, and `STRIP` while preserving existing environment variable behavior.
+- **Qual**: Added strict POSIX feature declaration for C11 builds through `Makefile.am`.
+- **Perf**: Removed extra shell process creation during compiler, strip, and chmod execution paths.
+- **Perf**: Removed runtime helper compilation overhead from `-H` execution path.
+- **Doc**: Updated `ChangeLog` and `README.md` change notes by adding entries in the existing project format only.
+
+*Original Credit to [@alsyundawy](https://github.com/alsyundawy)*
+
 ### 🌟 LATEST: MON Jun 15 19:52:11 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
 - **Feat**: Added absolute out-of-the-box compiler support for modern & legacy shells: `ksh88`, `ksh93`, `mksh`, `pdksh`, `fish`, `nu`, `pwsh`, `powershell`, `yash`, `osh`, `elvish`.

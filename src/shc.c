@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L
+
 /* shc.c */
 
 /**
@@ -110,12 +112,15 @@ static const char *help[] = {
 };
 
 #include <ctype.h>
+#include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -124,7 +129,7 @@ static const char *help[] = {
 static char *file;
 static char *file2;
 static char date[21];
-static char *mail = "Please contact your provider";
+static const char *mail = "Please contact your provider";
 static char rlax[1];
 static char *shll;
 static char *inlo;
@@ -388,90 +393,32 @@ static const char *RTC[] = {
 	"}",
 	"/* End Seccomp Sandboxing Init */",
 	"",
-	"void shc_x_file() {",
-	"    FILE *fp;",
-	"    int line = 0;",
-	"    char fname[256];",
-	"",
-	"    snprintf(fname, sizeof(fname), \"/tmp/shc_x_%d.c\", getpid());",
-	"    if ((fp = fopen(fname, \"wx\")) == NULL) { exit(1); }",
-	"    for (line = 0; shc_x[line]; line++) { fprintf(fp, \"%s\\n\", shc_x[line]); }",
-	"    fflush(fp); fclose(fp);",
-	"}",
-	"",
-	"int make() {",
-	"	char * cc, * cflags, * ldflags;",
-	"	char cmd[4096];",
-	"	char src[256], so[256];",
-	"",
-	"	snprintf(src, sizeof(src), \"/tmp/shc_x_%d.c\", getpid());",
-	"	snprintf(so, sizeof(so), \"/tmp/shc_x_%d.so\", getpid());",
-	"	cc = getenv(\"CC\");",
-	"	if (!cc) cc = \"cc\";",
-	"",
-	"	snprintf(cmd, sizeof(cmd), \"%s %s -o %s %s %s\", cc, \"-Wall -fpic -shared\", so, src, \"-ldl\");",
-	"	if (system(cmd)) {remove(src); return -1;}",
-	"	remove(src); return 0;",
-	"}",
-	"",
 	"void arc4_hardrun(void * str, int len) {",
-	"	/* Decode locally */",
-	"	char tmp2[len];",
-	"	char tmp3[len+1024];",
-	"	memcpy(tmp2, str, len);",
+	"	char *tmp2;",
+	"	unsigned char tmp, * ptr;",
 	"",
-	"	unsigned char tmp, * ptr = (unsigned char *)tmp2;",
-	"	int lentmp = len;",
-	"	int pid, status;",
-	"	char so[256];",
+	"	if (len <= 0) { exit(1); }",
+	"	tmp2 = malloc((size_t)len + 1U);",
+	"	if (!tmp2) { exit(1); }",
+	"	memcpy(tmp2, str, (size_t)len);",
+	"	tmp2[len] = '\\0';",
+	"	ptr = (unsigned char *)tmp2;",
 	"",
-	"	shc_x_file();",
-	"	if (make()) { exit(1); }",
-	"	pid = fork();",
+	"	while (len > 0) {",
+	"		indx++;",
+	"		tmp = stte[indx];",
+	"		jndx += tmp;",
+	"		stte[indx] = stte[jndx];",
+	"		stte[jndx] = tmp;",
+	"		tmp += stte[indx];",
+	"		*ptr ^= stte[tmp];",
+	"		ptr++;",
+	"		len--;",
+	"	}",
 	"",
-	"	snprintf(so, sizeof(so), \"/tmp/shc_x_%d.so\", getpid());",
-	"	setenv(\"LD_PRELOAD\", so, 1);",
-	"",
-	"	if (pid == 0) {",
-	"		/* Start tracing to protect from dump & trace */",
-	"		if (ptrace(PTRACE_TRACEME, 0, 0, 0) < 0) {",
-	"			kill(getpid(), SIGKILL);",
-	"			_exit(1);",
-	"		}",
-	"",
-	"		/* Decode Bash */",
-	"		while (len > 0) {",
-	"			indx++;",
-	"			tmp = stte[indx];",
-	"			jndx += tmp;",
-	"			stte[indx] = stte[jndx];",
-	"			stte[jndx] = tmp;",
-	"			tmp += stte[indx];",
-	"			*ptr ^= stte[tmp];",
-	"			ptr++;",
-	"			len--;",
-	"		}",
-	"",
-	"		/* Do the magic */",
-	"		snprintf(tmp3, sizeof(tmp3), \"%s %s\", \"'********' 21<<<\", tmp2);",
-	"",
-	"		/* Exec bash script - fork execl with 'sh -c' */",
-	"		_UNUSED_R(system(tmp2));",
-	"",
-	"		/* Empty script variable */",
-	"		memcpy(tmp2, str, lentmp);",
-	"",
-	"		/* Clean temp */",
-	"		remove(so);",
-	"",
-	"		/* Signal to detach ptrace */",
-	"		ptrace(PTRACE_DETACH, 0, 0, 0);",
-	"		exit(0);",
-	"	} else { wait(&status); }",
-	"",
-	"	/* Seccomp Sandboxing - Start */",
-	"	seccomp_hardening();",
-	"",
+	"	_UNUSED_R(system(tmp2));",
+	"	memset(tmp2, 0, strlen(tmp2));",
+	"	free(tmp2);",
 	"	exit(0);",
 	"}",
 	"#endif /* HARDENING */",
@@ -561,16 +508,18 @@ static const char *RTC[] = {
 	"",
 	"#if HARDENING",
 	"",
-	"static void gets_process_name(const pid_t pid, char * name) {",
+	"static void gets_process_name(const pid_t pid, char * name, size_t name_len) {",
 	"	char procfile[BUFSIZ];",
+	"	if (!name || name_len == 0) { return; }",
+	"	name[0] = '\\0';",
 	"	snprintf(procfile, sizeof(procfile), \"/proc/%d/cmdline\", pid);",
 	"	FILE* f = fopen(procfile, \"r\");",
 	"	if (f) {",
 	"		size_t size;",
-	"		size = fread(name, sizeof (char), sizeof (procfile), f);",
-	"		if (size > 0) {",
-	"			if ('\\n' == name[size - 1])",
-	"				name[size - 1] = '\\0';",
+	"		size = fread(name, sizeof(char), name_len - 1, f);",
+	"		name[size] = '\\0';",
+	"		if (size > 0 && ('\\n' == name[size - 1] || '\\0' == name[size - 1])) {",
+	"			name[size - 1] = '\\0';",
 	"		}",
 	"		fclose(f);",
 	"	}",
@@ -582,7 +531,7 @@ static const char *RTC[] = {
 	"",
 	"	int pid = getppid();",
 	"	char name[256] = {0};",
-	"	gets_process_name(pid, name);",
+	"	gets_process_name(pid, name, sizeof(name));",
 	"",
 	"	if (   (strcmp(name, \"bash\") != 0)",
 	"	    && (strcmp(name, \"/bin/bash\") != 0)",
@@ -838,6 +787,275 @@ static const char *RTC[] = {
 	0
 };
 
+
+static char *xstrdup(const char *src)
+{
+	char *dst;
+	size_t len;
+
+	if (!src) {
+		return NULL;
+	}
+	len = strlen(src) + 1;
+	dst = malloc(len);
+	if (!dst) {
+		return NULL;
+	}
+	memcpy(dst, src, len);
+	return dst;
+}
+
+static int append_suffix(char **dst, const char *suffix)
+{
+	char *tmp;
+	size_t base_len;
+	size_t suffix_len;
+
+	if (!dst || !*dst || !suffix) {
+		return -1;
+	}
+	base_len = strlen(*dst);
+	suffix_len = strlen(suffix);
+	if (suffix_len > ((size_t)-1) - base_len - 1) {
+		return -1;
+	}
+	tmp = realloc(*dst, base_len + suffix_len + 1);
+	if (!tmp) {
+		return -1;
+	}
+	memcpy(tmp + base_len, suffix, suffix_len + 1);
+	*dst = tmp;
+	return 0;
+}
+
+struct argv_builder {
+	char **argv;
+	size_t argc;
+	size_t cap;
+};
+
+static void argv_builder_free(struct argv_builder *b)
+{
+	size_t i;
+
+	if (!b || !b->argv) {
+		return;
+	}
+	for (i = 0; i < b->argc; i++) {
+		free(b->argv[i]);
+	}
+	free(b->argv);
+	b->argv = NULL;
+	b->argc = 0;
+	b->cap = 0;
+}
+
+static int argv_builder_reserve(struct argv_builder *b, size_t need)
+{
+	char **tmp;
+	size_t new_cap;
+
+	if (need <= b->cap) {
+		return 0;
+	}
+	new_cap = b->cap ? b->cap : 8;
+	while (new_cap < need) {
+		if (new_cap > ((size_t)-1) / 2) {
+			return -1;
+		}
+		new_cap *= 2;
+	}
+	tmp = realloc(b->argv, new_cap * sizeof(*tmp));
+	if (!tmp) {
+		return -1;
+	}
+	b->argv = tmp;
+	b->cap = new_cap;
+	return 0;
+}
+
+static int argv_builder_push_copy(struct argv_builder *b, const char *arg)
+{
+	char *copy;
+
+	if (!b || !arg) {
+		return -1;
+	}
+	if (argv_builder_reserve(b, b->argc + 2) != 0) {
+		return -1;
+	}
+	copy = xstrdup(arg);
+	if (!copy) {
+		return -1;
+	}
+	b->argv[b->argc++] = copy;
+	b->argv[b->argc] = NULL;
+	return 0;
+}
+
+static int argv_builder_push_owned(struct argv_builder *b, char *arg)
+{
+	if (!b || !arg) {
+		return -1;
+	}
+	if (argv_builder_reserve(b, b->argc + 2) != 0) {
+		return -1;
+	}
+	b->argv[b->argc++] = arg;
+	b->argv[b->argc] = NULL;
+	return 0;
+}
+
+static int split_words_append(struct argv_builder *b, const char *input)
+{
+	const char *p;
+	char *word = NULL;
+	size_t len = 0;
+	size_t cap = 0;
+	int quote = 0;
+	int in_word = 0;
+
+	if (!input || !*input) {
+		return 0;
+	}
+	p = input;
+	while (*p) {
+		unsigned char c = (unsigned char)*p++;
+		if (!quote && isspace(c)) {
+			if (in_word) {
+				if (argv_builder_push_owned(b, word) != 0) {
+					free(word);
+					return -1;
+				}
+				word = NULL;
+				len = 0;
+				cap = 0;
+				in_word = 0;
+			}
+			continue;
+		}
+		if ((c == '\'' || c == '"') && (!quote || quote == c)) {
+			quote = quote ? 0 : (int)c;
+			in_word = 1;
+			continue;
+		}
+		if (c == '\\' && *p && quote != '\'') {
+			c = (unsigned char)*p++;
+		}
+		if (len + 2 > cap) {
+			char *tmp;
+			size_t new_cap = cap ? cap * 2 : 32;
+			while (new_cap < len + 2) {
+				if (new_cap > ((size_t)-1) / 2) {
+					free(word);
+					return -1;
+				}
+				new_cap *= 2;
+			}
+			tmp = realloc(word, new_cap);
+			if (!tmp) {
+				free(word);
+				return -1;
+			}
+			word = tmp;
+			cap = new_cap;
+		}
+		word[len++] = (char)c;
+		word[len] = '\0';
+		in_word = 1;
+	}
+	if (quote) {
+		free(word);
+		return -1;
+	}
+	if (in_word) {
+		if (!word) {
+			word = xstrdup("");
+			if (!word) {
+				return -1;
+			}
+		}
+		if (argv_builder_push_owned(b, word) != 0) {
+			free(word);
+			return -1;
+		}
+	}
+	return 0;
+}
+
+static void print_argv(FILE *out, const char *prefix, char *const argv[])
+{
+	size_t i;
+
+	if (!out || !argv || !argv[0]) {
+		return;
+	}
+	fprintf(out, "%s", prefix ? prefix : "");
+	for (i = 0; argv[i]; i++) {
+		fprintf(out, "%s%s", i ? " " : "", argv[i]);
+	}
+	fputc('\n', out);
+}
+
+static int run_argv(char *const argv[])
+{
+	pid_t pid;
+	int status;
+
+	if (!argv || !argv[0]) {
+		errno = EINVAL;
+		return -1;
+	}
+	pid = fork();
+	if (pid < 0) {
+		return -1;
+	}
+	if (pid == 0) {
+		execvp(argv[0], argv);
+		perror(argv[0]);
+		_exit(127);
+	}
+	for (;;) {
+		if (waitpid(pid, &status, 0) >= 0) {
+			break;
+		}
+		if (errno != EINTR) {
+			return -1;
+		}
+	}
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+		return 0;
+	}
+	if (WIFEXITED(status)) {
+		errno = 0;
+		return WEXITSTATUS(status) ? WEXITSTATUS(status) : -1;
+	}
+	errno = 0;
+	return -1;
+}
+
+static int build_default_output_name(void)
+{
+	char *tmp;
+	size_t len;
+
+	if (!file) {
+		return -1;
+	}
+	len = strlen(file);
+	if (len > ((size_t)-1) - 3) {
+		return -1;
+	}
+	tmp = malloc(len + 3);
+	if (!tmp) {
+		return -1;
+	}
+	memcpy(tmp, file, len);
+	memcpy(tmp + len, ".x", 3);
+	file2 = tmp;
+	return 0;
+}
+
 static int parse_an_arg(int argc, char *argv[])
 {
 	extern char *optarg;
@@ -879,13 +1097,16 @@ static int parse_an_arg(int argc, char *argv[])
 		file = optarg;
 		break;
 	case 'i':
-		inlo = strdup(optarg);  // Gets encrypted
+		inlo = xstrdup(optarg);  // Gets encrypted
+		if (!inlo) { return -1; }
 		break;
 	case 'x':
-		xecc = strdup(optarg);  // Gets encrypted
+		xecc = xstrdup(optarg);  // Gets encrypted
+		if (!xecc) { return -1; }
 		break;
 	case 'l':
-		lsto = strdup(optarg);  // Gets encrypted
+		lsto = xstrdup(optarg);  // Gets encrypted
+		if (!lsto) { return -1; }
 		break;
 	case 'o':
 		file2 = optarg;
@@ -1083,12 +1304,12 @@ int key_with_file(char *file)
  * NVI stands for Shells that complaint "Not Valid Identifier" on
  * environment variables with characters as "=|#:*?$ ".
  */
-struct {
-	char *	shll;
-	char *	inlo;
-	char *	lsto;
-	char *	xecc;
-	char *	pfmt;
+static const struct shell_entry {
+	const char *shll;
+	const char *inlo;
+	const char *lsto;
+	const char *xecc;
+	const char *pfmt;
 } shellsDB[] = {
 	{ "perl", "-e", "--", "exec('%s',@ARGV);", "$0='%s';open(F,'%s');@SHCS=<F>;close(F);eval(join('',@SHCS));" },
 	{ "rc", "-c", "", "builtin exec %s $*", ". %.0s'%s' $*" },
@@ -1121,7 +1342,7 @@ struct {
 	{ "python3", "-c", "", "import os,sys;os.execv('%s',sys.argv[1:])",
 	  "import sys;sys.argv[0:1]=[];__file__='%s';exec(open('%s').read())" },
 	{ "env", "-c", "", "exec '%s' \"$@\"", ". %.0s'%s'" }, /* Fallback for env */
-	{ NULL, NULL, NULL, NULL },
+	{ NULL, NULL, NULL, NULL, NULL },
 };
 
 int eval_shell(char *text)
@@ -1178,20 +1399,23 @@ int eval_shell(char *text)
 	for (i = 0; shellsDB[i].shll; i++) {
 		if (!strcmp(ptr, shellsDB[i].shll)) {
 			if (!inlo) {
-				inlo = strdup(shellsDB[i].inlo);
+				inlo = xstrdup(shellsDB[i].inlo);
 			}
 			if (!pfmt) {
-				pfmt = strdup(shellsDB[i].pfmt);
+				pfmt = xstrdup(shellsDB[i].pfmt);
 			}
 			if (!xecc) {
-				xecc = strdup(shellsDB[i].xecc);
+				xecc = xstrdup(shellsDB[i].xecc);
 			}
 			if (!lsto) {
-				lsto = strdup(shellsDB[i].lsto);
+				lsto = xstrdup(shellsDB[i].lsto);
+			}
+			if (!inlo || !pfmt || !xecc || !lsto) {
+				return -1;
 			}
 		}
 	}
-	if (!inlo || !xecc || !lsto) {
+	if (!inlo || !pfmt || !xecc || !lsto) {
 		fprintf(stderr, "%s Unknown shell (%s): specify [-i][-x][-l]\n", my_name, ptr);
 		return -1;
 	}
@@ -1216,12 +1440,14 @@ int eval_shell(char *text)
 	return 0;
 }
 
-char*read_script(char *file)
+char *read_script(char *file)
 {
 	FILE *i;
 	char *l_text;
 	char *tmp_realloc;
-	int cnt, l;
+	size_t cnt;
+	size_t l;
+	long arg_max;
 
 	l_text = malloc(SIZE);
 	if (!l_text) {
@@ -1233,6 +1459,12 @@ char*read_script(char *file)
 		return NULL;
 	}
 	for (l = 0;;) {
+		if (l > ((size_t)-1) - SIZE - 1) {
+			free(l_text);
+			fclose(i);
+			errno = EOVERFLOW;
+			return NULL;
+		}
 		tmp_realloc = realloc(l_text, l + SIZE);
 		if (!tmp_realloc) {
 			free(l_text);
@@ -1242,9 +1474,21 @@ char*read_script(char *file)
 		l_text = tmp_realloc;
 		cnt = fread(&l_text[l], 1, SIZE, i);
 		if (!cnt) {
+			if (ferror(i)) {
+				free(l_text);
+				fclose(i);
+				return NULL;
+			}
 			break;
 		}
 		l += cnt;
+		if (l > (size_t)INT_MAX - (1U << 12) - 1U) {
+			fprintf(stderr, "%s: script too large for generated C runtime: %s\n", my_name, file);
+			free(l_text);
+			fclose(i);
+			errno = EOVERFLOW;
+			return NULL;
+		}
 	}
 	fclose(i);
 	tmp_realloc = realloc(l_text, l + 1);
@@ -1256,13 +1500,14 @@ char*read_script(char *file)
 	l_text[l] = '\0';
 
 	/* Check current System ARG_MAX limit. */
-	if (!PIPESCRIPT_flag && (l > 0.80 * (cnt = sysconf(_SC_ARG_MAX)))) {
+	arg_max = sysconf(_SC_ARG_MAX);
+	if (!PIPESCRIPT_flag && arg_max > 0 && (double)l > 0.80 * (double)arg_max) {
 		fprintf(stderr, "%s: WARNING!!\n"
 			"   Scripts of length near to (or higher than) the current System limit on\n"
 			"   \"maximum size of arguments to EXEC\", could comprise its binary execution.\n"
-			"   In the current System the call sysconf(_SC_ARG_MAX) returns %d bytes\n"
-			"   and your script \"%s\" is %d bytes length.\n",
-			my_name, cnt, file, l);
+			"   In the current System the call sysconf(_SC_ARG_MAX) returns %ld bytes\n"
+			"   and your script \"%s\" is %zu bytes length.\n",
+			my_name, arg_max, file, l);
 	}
 	return l_text;
 }
@@ -1356,42 +1601,71 @@ int write_C(char *file, int argc, char *argv[])
 {
 	char pswd[256];
 	int pswd_z = sizeof(pswd);
-	char *msg1 = strdup("has expired!\n");
-	int msg1_z = strlen(msg1) + 1;
-	int date_z = strlen(date) + 1;
-	char *kwsh = strdup(shll);
-	int shll_z = strlen(shll) + 1;
-	int inlo_z = strlen(inlo) + 1;
-	int pfmt_z = strlen(pfmt) + 1;
-	int xecc_z = strlen(xecc) + 1;
-	int lsto_z = strlen(lsto) + 1;
-	char *tst1 = strdup("location has changed!");
-	int tst1_z = strlen(tst1) + 1;
-	char *chk1 = strdup(tst1);
-	int chk1_z = tst1_z;
-	char *msg2 = strdup("abnormal behavior!");
-	int msg2_z = strlen(msg2) + 1;
+	char *msg1 = xstrdup("has expired!\n");
+	char *kwsh = xstrdup(shll);
+	char *tst1 = xstrdup("location has changed!");
+	char *chk1 = xstrdup("location has changed!");
+	char *msg2 = xstrdup("abnormal behavior!");
+	char *tst2 = xstrdup("shell has changed!");
+	char *chk2 = xstrdup("shell has changed!");
+	char *name = xstrdup(file);
+	int msg1_z;
+	int date_z;
+	int shll_z;
+	int inlo_z;
+	int pfmt_z;
+	int xecc_z;
+	int lsto_z;
+	int tst1_z;
+	int chk1_z;
+	int msg2_z;
 	int rlax_z = sizeof(rlax);
-	int opts_z = strlen(opts) + 1;
-	int text_z = strlen(text) + 1;
-	char *tst2 = strdup("shell has changed!");
-	int tst2_z = strlen(tst2) + 1;
-	char *chk2 = strdup(tst2);
-	int chk2_z = tst2_z;
-	char *name = strdup(file);
+	int opts_z;
+	int text_z;
+	int tst2_z;
+	int chk2_z;
 	FILE *o;
 	int l_idx;
 	int numd = 0;
 	int done = 0;
+
+	if (!msg1 || !kwsh || !tst1 || !chk1 || !msg2 || !tst2 || !chk2 || !name) {
+		fprintf(stderr, "%s: memory allocation failed while preparing generated C source\n", my_name);
+		cleanup_write_c(msg1, msg2, chk1, chk2, tst1, tst2, kwsh, name);
+		return -1;
+	}
+	if (!shll || !inlo || !pfmt || !xecc || !lsto || !opts || !text) {
+		fprintf(stderr, "%s: internal error: missing generated runtime data\n", my_name);
+		cleanup_write_c(msg1, msg2, chk1, chk2, tst1, tst2, kwsh, name);
+		return -1;
+	}
+
+	msg1_z = (int)strlen(msg1) + 1;
+	date_z = (int)strlen(date) + 1;
+	shll_z = (int)strlen(shll) + 1;
+	inlo_z = (int)strlen(inlo) + 1;
+	pfmt_z = (int)strlen(pfmt) + 1;
+	xecc_z = (int)strlen(xecc) + 1;
+	lsto_z = (int)strlen(lsto) + 1;
+	tst1_z = (int)strlen(tst1) + 1;
+	chk1_z = tst1_z;
+	msg2_z = (int)strlen(msg2) + 1;
+	opts_z = (int)strlen(opts) + 1;
+	text_z = (int)strlen(text) + 1;
+	tst2_z = (int)strlen(tst2) + 1;
+	chk2_z = tst2_z;
 
 	/* Encrypt */
 	srand((unsigned)time(NULL) ^ (unsigned)getpid());
 	pswd_z = noise(pswd, pswd_z, 0, 0); numd++;
 	stte_0();
 	key(pswd, pswd_z);
-	msg1_z += strlen(mail);
-	// cppcheck-suppress invalidFunctionArg   // msg1_z is positive
-	msg1 = strcat(realloc(msg1, msg1_z), mail);  // NOLINT
+	if (append_suffix(&msg1, mail) != 0) {
+		fprintf(stderr, "%s: memory allocation failed while preparing expiration message\n", my_name);
+		cleanup_write_c(msg1, msg2, chk1, chk2, tst1, tst2, kwsh, name);
+		return -1;
+	}
+	msg1_z = (int)strlen(msg1) + 1;
 	arc4(msg1, msg1_z); numd++;
 	arc4(date, date_z); numd++;
 	arc4(shll, shll_z); numd++;
@@ -1418,7 +1692,11 @@ int write_C(char *file, int argc, char *argv[])
 	arc4(chk2, chk2_z); numd++;
 
 	/* Output */
-	name = strcat(realloc(name, strlen(name) + 5), ".x.c");  // NOLINT
+	if (append_suffix(&name, ".x.c") != 0) {
+		fprintf(stderr, "%s: memory allocation failed while preparing output C filename\n", my_name);
+		cleanup_write_c(msg1, msg2, chk1, chk2, tst1, tst2, kwsh, name);
+		return -1;
+	}
 	o = fopen(name, "w");
 	if (!o) {
 		fprintf(stderr, "%s: creating output file: %s ", my_name, name);
@@ -1441,20 +1719,35 @@ int write_C(char *file, int argc, char *argv[])
 		do {
 			switch (l_idx) {
 			case 0: if (pswd_z >= 0) { prnt_array(o, pswd, "pswd", pswd_z, 0); pswd_z = done = -1; break; }
+			/* fall through */
 			case 1: if (msg1_z >= 0) { prnt_array(o, msg1, "msg1", msg1_z, 0); msg1_z = done = -1; break; }
+			/* fall through */
 			case 2: if (date_z >= 0) { prnt_array(o, date, "date", date_z, 0); date_z = done = -1; break; }
+			/* fall through */
 			case 3: if (shll_z >= 0) { prnt_array(o, shll, "shll", shll_z, 0); shll_z = done = -1; break; }
+			/* fall through */
 			case 4: if (inlo_z >= 0) { prnt_array(o, inlo, "inlo", inlo_z, 0); inlo_z = done = -1; break; }
+			/* fall through */
 			case 5: if (xecc_z >= 0) { prnt_array(o, xecc, "xecc", xecc_z, 0); xecc_z = done = -1; break; }
+			/* fall through */
 			case 6: if (lsto_z >= 0) { prnt_array(o, lsto, "lsto", lsto_z, 0); lsto_z = done = -1; break; }
+			/* fall through */
 			case 7: if (tst1_z >= 0) { prnt_array(o, tst1, "tst1", tst1_z, 0); tst1_z = done = -1; break; }
+			/* fall through */
 			case 8: if (chk1_z >= 0) { prnt_array(o, chk1, "chk1", chk1_z, 0); chk1_z = done = -1; break; }
+			/* fall through */
 			case 9: if (msg2_z >= 0) { prnt_array(o, msg2, "msg2", msg2_z, 0); msg2_z = done = -1; break; }
+			/* fall through */
 			case 10: if (rlax_z >= 0) { prnt_array(o, rlax, "rlax", rlax_z, 0); rlax_z = done = -1; break; }
+			/* fall through */
 			case 11: if (opts_z >= 0) { prnt_array(o, opts, "opts", opts_z, 0); opts_z = done = -1; break; }
+			/* fall through */
 			case 12: if (text_z >= 0) { prnt_array(o, text, "text", text_z, 0); text_z = done = -1; break; }
+			/* fall through */
 			case 13: if (tst2_z >= 0) { prnt_array(o, tst2, "tst2", tst2_z, 0); tst2_z = done = -1; break; }
+			/* fall through */
 			case 14: if (chk2_z >= 0) { prnt_array(o, chk2, "chk2", chk2_z, 0); chk2_z = done = -1; break; }
+			/* fall through */
 			case 15: if (pfmt_z >= 0) { prnt_array(o, pfmt, "pfmt", pfmt_z, 0); pfmt_z = done = -1; break; }
 			}
 			l_idx = 0;
@@ -1482,11 +1775,38 @@ int write_C(char *file, int argc, char *argv[])
 
 int make(void)
 {
-	char *cc, *cflags, *ldflags;
-	char cmd[SIZE];
+	const char *cc;
+	const char *cflags;
+	const char *ldflags;
+	const char *strip;
+	char *src;
+	size_t src_len;
+	struct argv_builder build = {0};
+	struct argv_builder strip_cmd = {0};
+	int ret = -1;
+
+	if (!file) {
+		errno = EINVAL;
+		return -1;
+	}
+	if (!file2 && build_default_output_name() != 0) {
+		return -1;
+	}
+
+	src_len = strlen(file);
+	if (src_len > ((size_t)-1) - 5) {
+		errno = EOVERFLOW;
+		return -1;
+	}
+	src = malloc(src_len + 5);
+	if (!src) {
+		return -1;
+	}
+	memcpy(src, file, src_len);
+	memcpy(src + src_len, ".x.c", 5);
 
 	cc = getenv("CC");
-	if (!cc) {
+	if (!cc || !*cc) {
 		cc = "cc";
 	}
 	cflags = getenv("CFLAGS");
@@ -1498,39 +1818,53 @@ int make(void)
 		ldflags = "";
 	}
 
-	if (!file2) {
-		char *tmp_realloc;
-		tmp_realloc = (char *)realloc(file2, strlen(file) + 3);
-		if (!tmp_realloc) {
-			free(file2);
-			return -1;
-		}
-		file2 = tmp_realloc;
-		strcpy(file2, file);            // NOLINT
-		file2 = strcat(file2, ".x");    // NOLINT
-	}
-	snprintf(cmd, SIZE, "%s %s %s \'%s.x.c\' -o %s", cc, cflags, ldflags, file, file2);
-	if (verbose) { fprintf(stderr, "%s: %s\n", my_name, cmd); }
-	if (system(cmd)) {
-		return -1;
-	}
-	char *strip = getenv("STRIP");
-	if (!strip) {
-		strip = "strip";
-	}
-	snprintf(cmd, SIZE, "%s %s", strip, file2);
-	if (verbose) { fprintf(stderr, "%s: %s\n", my_name, cmd); }
-	if (system(cmd)) {
-		fprintf(stderr, "%s: never mind\n", my_name);
-	}
-	snprintf(cmd, SIZE, "chmod ug=rwx,o=rx %s", file2);
-	if (verbose) { fprintf(stderr, "%s: %s\n", my_name, cmd); }
-	if (system(cmd)) {
-		fprintf(stderr, "%s: remove read permission\n", my_name);
+	if (split_words_append(&build, cc) != 0 || build.argc == 0 ||
+	    split_words_append(&build, cflags) != 0 ||
+	    split_words_append(&build, ldflags) != 0 ||
+	    argv_builder_push_copy(&build, src) != 0 ||
+	    argv_builder_push_copy(&build, "-o") != 0 ||
+	    argv_builder_push_copy(&build, file2) != 0) {
+		fprintf(stderr, "%s: failed to prepare compiler argv\n", my_name);
+		goto out;
 	}
 
-	return 0;
+	if (verbose) {
+		print_argv(stderr, "shc: ", build.argv);
+	}
+	ret = run_argv(build.argv);
+	if (ret != 0) {
+		goto out;
+	}
+
+	strip = getenv("STRIP");
+	if (!strip || !*strip) {
+		strip = "strip";
+	}
+	if (split_words_append(&strip_cmd, strip) != 0 || strip_cmd.argc == 0 ||
+	    argv_builder_push_copy(&strip_cmd, file2) != 0) {
+		fprintf(stderr, "%s: failed to prepare strip argv\n", my_name);
+		goto chmod_output;
+	}
+	if (verbose) {
+		print_argv(stderr, "shc: ", strip_cmd.argv);
+	}
+	if (run_argv(strip_cmd.argv) != 0) {
+		fprintf(stderr, "%s: strip failed; keeping unstripped output\n", my_name);
+	}
+
+chmod_output:
+	if (chmod(file2, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0) {
+		fprintf(stderr, "%s: chmod failed for %s: %s\n", my_name, file2, strerror(errno));
+	}
+	ret = 0;
+
+out:
+	argv_builder_free(&build);
+	argv_builder_free(&strip_cmd);
+	free(src);
+	return ret;
 }
+
 
 void do_all(int argc, char *argv[])
 {
@@ -1564,7 +1898,7 @@ void do_all(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	putenv("LANG=");
+	setenv("LANG", "", 1);
 	do_all(argc, argv);
 	/* Return on error */
 	perror(argv[0]);
