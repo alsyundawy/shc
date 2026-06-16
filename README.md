@@ -135,7 +135,6 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 
 > **By HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION**
 
-
 ### 🌟 LATEST: MON Jun 15 23:59:23 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
 - **Feat**: Added `-V` and `--version` options in `src/shc.c` to print version and exit, keeping POSIX `getopt(3)` compatibility without `getopt_long`.
@@ -151,7 +150,6 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 - **Docs**: Documented corrected version credit in `README.md`, `docs/CHANGELOG.md`, `docs/DOCNOTE.md` to match ChangeLog collaboration notes.
 
 *Original Credit to [@alsyundawy](https://github.com/alsyundawy)*
-
 
 ### 🌟 LATEST: MON Jun 15 22:47:41 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 

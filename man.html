@@ -4,9 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc 3.10" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="author" content="" />
-  <meta name="dcterms.date" content="2026-06-15" />
-  <title>shc(1) shc user manual</title>
+  <title>man</title>
   <style>
     /* Default styles provided by pandoc.
     ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -243,19 +241,16 @@
   </style>
 </head>
 <body>
-<header id="title-block-header">
-<h1 class="title">shc(1) shc user manual</h1>
-<p class="author"></p>
-<p class="date">June 15, 2026</p>
-</header>
-<hr>
-<h1 id="name">NAME</h1>
+<h1 id="shc1-shc-user-manual">shc(1) shc user manual</h1>
+<p><strong>Date:</strong> June 15, 2026</p>
+<hr />
+<h2 id="name">NAME</h2>
 <p>shc - Generic shell script compiler</p>
-<h1 id="synopsis">SYNOPSIS</h1>
+<h2 id="synopsis">SYNOPSIS</h2>
 <p><strong>shc</strong> [ -e <em>DATE</em> ] [ -m <em>MESSAGE</em> ] [
 -i <em>IOPT</em> ] [ -x <em>CMD</em> ] [ -l <em>LOPT</em> ] [ -o
 <em>OUTFILE</em> ] [ -2ABCDHpPSUhrv ] -f <em>SCRIPT</em></p>
-<h1 id="description">DESCRIPTION</h1>
+<h2 id="description">DESCRIPTION</h2>
 <p><strong>shc</strong> creates a stripped binary executable version of
 the script specified with <code>-f</code> on the command line.</p>
 <p>The binary version will get a <code>.x</code> extension appended by
@@ -290,7 +285,7 @@ improvement as a real C program would.</p>
 from modification or inspection. You can use it if you wish to
 distribute your scripts but don’t want them to be easily readable by
 other people.</p>
-<h1 id="options">OPTIONS</h1>
+<h2 id="options">OPTIONS</h2>
 <dl>
 <dt>-e <em>DATE</em></dt>
 <dd>
@@ -382,7 +377,7 @@ Compile for BusyBox
 Display help and exit
 </dd>
 </dl>
-<h1 id="environment-variables">ENVIRONMENT VARIABLES</h1>
+<h2 id="environment-variables">ENVIRONMENT VARIABLES</h2>
 <p>These can be used to provide options to the GCC Compiler. Examples:
 static compilation, machine architecture, sanitize options.</p>
 <dl>
@@ -399,7 +394,7 @@ C compiler flags <code>[none]</code>
 Linker flags <code>[none]</code>
 </dd>
 </dl>
-<h1 id="examples">EXAMPLES</h1>
+<h2 id="examples">EXAMPLES</h2>
 <p>Compile a script which can be run on other systems with the trace
 option enabled (without <code>-U</code> flag):</p>
 <div class="sourceCode" id="cb1"><pre
@@ -411,11 +406,11 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="
 (experimental):</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">shc</span> <span class="at">-Hf</span> myscript <span class="at">-o</span> mybinary</span></code></pre></div>
-<h1 id="limitations">LIMITATIONS</h1>
+<h2 id="limitations">LIMITATIONS</h2>
 <p>The maximum size of the script that could be executed once compiled
 is limited by the operating system configuration parameter
 <code>_SC_ARG_MAX</code> (see sysconf(2))</p>
-<h1 id="main-authors">MAIN AUTHORS</h1>
+<h2 id="main-authors">MAIN AUTHORS</h2>
 <p>HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION (Audit &amp; Hardening
 2026) Francisco Rosales <a href="mailto:frosal@fi.upm.es"
 class="email">frosal@fi.upm.es</a> Md Jahidul Hamid <a
@@ -423,7 +418,8 @@ href="mailto:jahidulhamid@yahoo.com"
 class="email">jahidulhamid@yahoo.com</a></p>
 <p>Note: Do not contact the original authors, they are no longer
 actively involved</p>
-<h1 id="report-bugs-to">REPORT BUGS TO</h1>
-<p>https://github.com/alsyundawy/shc/issues</p>
+<h2 id="report-bugs-to">REPORT BUGS TO</h2>
+<p><a href="https://github.com/alsyundawy/shc/issues"
+class="uri">https://github.com/alsyundawy/shc/issues</a></p>
 </body>
 </html>
