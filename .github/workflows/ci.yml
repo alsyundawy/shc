@@ -2,6 +2,9 @@ name: CI
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     # Normally runs in less than 50 seconds, but could stall because of test
@@ -10,10 +13,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install dependencies
-      run: sudo apt-get update -q && sudo apt install -y dash bash ksh zsh tcsh csh rc
+      run: sudo apt-get update -q && sudo apt install -y dash bash ksh zsh tcsh csh rc shellcheck dos2unix
 
     - name: Build and Test (with sanitize)
       env:
@@ -53,7 +56,7 @@ jobs:
         make test
 
     - name: Provide log as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: ${{ ! cancelled() }}
       with:
         name: shc.failingtests
