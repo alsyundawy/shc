@@ -135,7 +135,25 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 
 > **By HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION**
 
-### 🌟 LATEST: MON Jun 15 23:58:40 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+
+### 🌟 LATEST: MON Jun 15 23:59:23 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+
+- **Feat**: Added `-V` and `--version` options in `src/shc.c` to print version and exit, keeping POSIX `getopt(3)` compatibility without `getopt_long`.
+- **Feat**: Expanded `shc -V` and `--version` output to include original author, provider/maintainer, core collaborator, SHC contributors, repository URL, and audit hardening credit.
+- **Sec**: Hardened `-P`/`-p` pipe runtime by replacing predictable `/tmp` FIFO names with `mkdtemp(3)`-backed private temporary directories.
+- **Sec**: Added FIFO writer validation: checked `open(2)`, closed descriptors, unlinked FIFO, and removed private temp directory after pipe delivery.
+- **Fix**: Replaced fixed 256-byte pipe command buffer with dynamic `snprintf(NULL, 0, ...)` allocation to prevent truncation.
+- **Fix**: Fixed `SKIP_OPTS` parsing in `test/ttest.sh` so empty option is not skipped when `SKIP_OPTS` is unset.
+- **Qual**: Added runtime `PATH_MAX` fallback and feature macro guards for `mkdtemp(3)`, `putenv(3)`, `setenv(3)`, and strict builds in `src/shc.c`.
+- **Qual**: Bumped package and version to `5.0.8-Hardened-Audit-2026` in `configure.ac`, `src/shc.c`, `README.md`, `docs/CHANGELOG.md`, `docs/DOCNOTE.md`.
+- **Qual**: Declared newly used headers/functions in `configure.ac`.
+- **Qual**: Added stricter warning flags for normal maintainer builds in `src/Makefile.am`.
+- **Docs**: Documented corrected version credit in `README.md`, `docs/CHANGELOG.md`, `docs/DOCNOTE.md` to match ChangeLog collaboration notes.
+
+*Original Credit to [@alsyundawy](https://github.com/alsyundawy)*
+
+
+### 🌟 LATEST: MON Jun 15 22:47:41 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
 - **Sec**: Hardened generated `-P`/`-p` pipe mode by replacing predictable `/tmp/%08x` FIFO names with `mkdtemp(3)` private temporary directories.
 - **Sec**: Added strict FIFO writer error handling: checked `open(2)`, closed the descriptor, unlinked the FIFO, and removed the private temp directory.

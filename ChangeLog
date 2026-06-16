@@ -1,5 +1,22 @@
 # CHANGES - Audit & Hardening by HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
-LATEST MON Jun 15 23:58:40 WIB 2026 -  HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+
+
+LATEST MON Jun 15 23:59:23 WIB 2026 -  HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+
+	* Bump package and version to 5.0.8-Hardened-Audit-2026 in configure.ac, src/shc.c, README.md, docs/CHANGELOG.md, docs/DOCNOTE.md
+	* Expand shc -V and --version output to include original author, provider/maintainer, core collaborator, SHC contributors, repository URL, and audit hardening credit
+	* Add -V and --version options in src/shc.c to print version and exit, keeping POSIX getopt(3) compatibility without getopt_long
+	* Harden -P/-p pipe runtime by replacing predictable /tmp FIFO names with mkdtemp(3)-backed private temporary directories
+	* Add runtime PATH_MAX fallback and feature macro guards for mkdtemp(3), putenv(3), setenv(3), and strict builds in src/shc.c
+	* Replace fixed 256-byte pipe command buffer with dynamic snprintf(NULL,0,...) allocation to prevent truncation
+	* Check FIFO writer open(2), close descriptors, unlink FIFO, and remove private temp directory after pipe delivery
+	* Fix SKIP_OPTS parsing in test/ttest.sh so empty option is not skipped when SKIP_OPTS is unset
+	* Declare newly used headers/functions in configure.ac
+	* Add stricter warning flags for normal maintainer builds in src/Makefile.am
+	* Document corrected version credit in README.md, docs/CHANGELOG.md, docs/DOCNOTE.md to match ChangeLog
+
+
+LATEST MON Jun 15 22:47:41 WIB 2026 -  HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
 	* src/shc.c: Bump hardened audit version to 4.0.4.
 	* src/shc.c: Harden generated -P/-p pipe runtime by replacing predictable

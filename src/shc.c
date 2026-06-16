@@ -21,16 +21,23 @@
  */
 
 static const char my_name[] = "shc";
-static const char version[] = "Version 4.0.4 (Hardened Audit Edition - 15 Jun 2026)";
+static const char version[] = "Version 5.0.8-Hardened-Audit-2026";
 static const char subject[] = "Generic Shell Script Compiler";
 static const char cpright[] = "GNU GPL Version 3";
 static const struct {const char *f, *s, *e;}
 provider = { "Md Jahidul", "Hamid", "<jahidulhamid@yahoo.com>" };
+static const struct {const char *f, *s, *e;}
+original_author = { "Francisco", "Garcia", "<frosal@fi.upm.es>" };
 
-/*
-   static const struct { const char * f, * s, * e; }
-    author = { "Francisco", "Garcia", "<frosal@fi.upm.es>" };
- */
+static const char *version_credits[] = {
+	"Original author    : Francisco Garcia <frosal@fi.upm.es>",
+	"Provider/Maintainer: Md Jahidul Hamid <jahidulhamid@yahoo.com>",
+	"Core collaborator  : @mdeweerd and SHC contributors",
+	"Audit & Hardening  : HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION (2026)",
+	"Repository         : https://github.com/alsyundawy/shc",
+	0
+};
+
 /*This is the original author who first came up with this*/
 
 static const char *copying[] = {
@@ -73,7 +80,7 @@ static const char *abstract[] = {
 };
 
 static const char usage[] =
-	"Usage: shc [-e DATE] [-m MESSAGE] [-i IOPT] [-x CMD] [-l LOPT] [-o OUTFILE] [-2ABCDhHpPrSUv] -f SCRIPT";
+	"Usage: shc [--version] [-e DATE] [-m MESSAGE] [-i IOPT] [-x CMD] [-l LOPT] [-o OUTFILE] [-2ABCDhHpPrSUVv] -f SCRIPT";
 
 static const char *help[] = {
 	"",
@@ -86,6 +93,7 @@ static const char *help[] = {
 	"    -o %s  output filename",
 	"    -r     Relax security. Make a redistributable binary",
 	"    -v     Verbose compilation",
+	"    -V, --version  Display version and exit",
 	"    -S     Switch ON setuid for root callable programs [OFF]",
 	"    -D     Switch ON debug exec calls [OFF]",
 	"    -U     Make binary untraceable [no]",
@@ -1079,14 +1087,34 @@ static int build_default_output_name(void)
 	return 0;
 }
 
+static void print_version(FILE *out)
+{
+	int i;
+
+	if (!out) {
+		out = stdout;
+	}
+	fprintf(out, "%s %s, %s\n", my_name, version, subject);
+	fprintf(out, "%s License          : %s\n", my_name, cpright);
+	for (i = 0; version_credits[i]; i++) {
+		fprintf(out, "%s %s\n", my_name, version_credits[i]);
+	}
+}
+
 static int parse_an_arg(int argc, char *argv[])
 {
 	extern char *optarg;
-	const char *opts = "e:m:i:x:l:o:f:2ABCDhHpPrSUv";
+	extern int optind;
+	const char *opts = "e:m:i:x:l:o:f:2ABCDhHpPrSUVv";
 	struct tm tmp[1];
 	time_t expdate;
 	int cnt, l;
 	char ctrl;
+
+	if (optind < argc && strcmp(argv[optind], "--version") == 0) {
+		print_version(stdout);
+		exit(0);
+	}
 
 	switch (getopt(argc, argv, opts)) {
 	case 'e':
@@ -1139,6 +1167,10 @@ static int parse_an_arg(int argc, char *argv[])
 		break;
 	case 'v':
 		verbose++;
+		break;
+	case 'V':
+		print_version(stdout);
+		exit(0);
 		break;
 	case 'S':
 		SETUID_flag = 1;
