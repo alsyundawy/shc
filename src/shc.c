@@ -1435,8 +1435,17 @@ int eval_shell(char *text)
 	ptr[i] = '\0';
 
 	*opts = '\0';
-	// cppcheck-suppress invalidscanf   // (required memory checked above)
-	i = sscanf(ptr, " #!%s %[^\n]", shll, opts);
+	{
+		char scanfmt[64];
+		int nfmt;
+		nfmt = snprintf(scanfmt, sizeof(scanfmt), " #!%%%ds %%%d[^\n]", i, i);
+		if (nfmt < 0 || (size_t)nfmt >= sizeof(scanfmt)) {
+			free(ptr);
+			return -1;
+		}
+		// cppcheck-suppress invalidscanf   // width is bounded by allocated size
+		i = sscanf(ptr, scanfmt, shll, opts);
+	}
 	if ((i < 1) || (i > 2)) {
 		fprintf(stderr, "%s: invalid first line in script: %s\n", my_name, ptr);
 		free(ptr);
