@@ -1,4 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* shc.c */
 
@@ -1771,12 +1774,22 @@ int write_C(char *file, int argc, char *argv[])
 		cleanup_write_c(msg1, msg2, chk1, chk2, tst1, tst2, kwsh, name);
 		return -1;
 	}
-	o = fopen(name, "w");
-	if (!o) {
-		fprintf(stderr, "%s: creating output file: %s ", my_name, name);
-		perror("");
-		cleanup_write_c(msg1, msg2, chk1, chk2, tst1, tst2, kwsh, name);
-		exit(1);
+	{
+		int fd = open(name, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+		if (fd < 0) {
+			fprintf(stderr, "%s: creating output file: %s ", my_name, name);
+			perror("");
+			cleanup_write_c(msg1, msg2, chk1, chk2, tst1, tst2, kwsh, name);
+			exit(1);
+		}
+		o = fdopen(fd, "w");
+		if (!o) {
+			fprintf(stderr, "%s: creating output file: %s ", my_name, name);
+			perror("");
+			close(fd);
+			cleanup_write_c(msg1, msg2, chk1, chk2, tst1, tst2, kwsh, name);
+			exit(1);
+		}
 	}
 	fprintf(o, "#if 0\n");
 	fprintf(o, "\t%s %s, %s\n", my_name, version, subject);
