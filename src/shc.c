@@ -1132,9 +1132,19 @@ static int parse_an_arg(int argc, char *argv[])
 			return -1;
 		}
 		snprintf(date, sizeof(date), "%lld", (long long)expdate);  // NOLINT
-		if (verbose) { fprintf(stderr, "%s -e %s", my_name, ctime(&expdate)); }
+		if (verbose) {
+			char expdate_str[26];
+			if (ctime_r(&expdate, expdate_str) != NULL) {
+				fprintf(stderr, "%s -e %s", my_name, expdate_str);
+			}
+		}
 		expdate = atoll(date);
-		if (verbose) { fprintf(stderr, "%s -e %s", my_name, ctime(&expdate)); }
+		if (verbose) {
+			char expdate_str[26];
+			if (ctime_r(&expdate, expdate_str) != NULL) {
+				fprintf(stderr, "%s -e %s", my_name, expdate_str);
+			}
+		}
 		break;
 	case 'm':
 		mail = optarg;
