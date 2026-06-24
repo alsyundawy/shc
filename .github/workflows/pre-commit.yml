@@ -15,7 +15,7 @@ jobs:
       CS_XML: pre-commit.xml
     steps:
       - run: sudo apt-get update && sudo apt-get install cppcheck
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           cache: pip
