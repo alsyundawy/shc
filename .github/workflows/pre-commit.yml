@@ -21,7 +21,7 @@ jobs:
           cache: pip
           python-version: "3.12.1"
       - run: python -m pip install pre-commit
-      - uses: actions/cache/restore@v5
+      - uses: actions/cache/restore@v6
         with:
           path: ~/.cache/pre-commit/
           key: pre-commit-4|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml')
@@ -38,7 +38,7 @@ jobs:
         if: ${{ failure() }}
         with:
           in: ${{ env.RAW_LOG }}
-      - uses: actions/cache/save@v5
+      - uses: actions/cache/save@v6
         if: ${{ ! cancelled() }}
         with:
           path: ~/.cache/pre-commit/
