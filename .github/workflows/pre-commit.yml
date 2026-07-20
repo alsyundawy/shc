@@ -16,7 +16,7 @@ jobs:
     steps:
       - run: sudo apt-get update && sudo apt-get install cppcheck
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           cache: pip
           python-version: "3.12.1"
