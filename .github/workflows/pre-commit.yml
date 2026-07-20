@@ -34,7 +34,7 @@ jobs:
           pre-commit gc
           pre-commit run --show-diff-on-failure --color=always --all-files | tee ${RAW_LOG}
       - name: Convert Raw Log to Annotations
-        uses: mdeweerd/logToCheckStyle@v2025.11.2
+        uses: mdeweerd/logToCheckStyle@v2026.7.1
         if: ${{ failure() }}
         with:
           in: ${{ env.RAW_LOG }}
