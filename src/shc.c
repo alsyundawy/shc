@@ -1,4 +1,15 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#ifndef _DARWIN_C_SOURCE
+#define _DARWIN_C_SOURCE
+#endif
+#ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
+#endif
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -272,6 +283,12 @@ static const char *RTC[] = {
 	"#ifndef _GNU_SOURCE",
 	"#define _GNU_SOURCE",
 	"#endif",
+	"#ifndef _DEFAULT_SOURCE",
+	"#define _DEFAULT_SOURCE",
+	"#endif",
+	"#ifndef _DARWIN_C_SOURCE",
+	"#define _DARWIN_C_SOURCE",
+	"#endif",
 	"#ifndef _POSIX_C_SOURCE",
 	"#define _POSIX_C_SOURCE 200809L",
 	"#endif",
@@ -350,6 +367,7 @@ static const char *RTC[] = {
 	"#include <sys/ptrace.h>",
 	"#include <sys/wait.h>",
 	"#include <signal.h>",
+	"#if defined(__linux__)",
 	"#include <sys/prctl.h>",
 	"#define PR_SET_PTRACER 0x59616d61",
 	"",
@@ -362,7 +380,6 @@ static const char *RTC[] = {
 	"#include <errno.h>",
 	"",
 	"#include <sys/types.h>",
-	"#include <sys/prctl.h>",
 	"#include <sys/syscall.h>",
 	"#include <sys/socket.h>",
 	"",
@@ -414,6 +431,9 @@ static const char *RTC[] = {
 	"        exit(1);",
 	"    }",
 	"}",
+	"#else",
+	"void seccomp_hardening() {}",
+	"#endif",
 	"/* End Seccomp Sandboxing Init */",
 	"",
 	"void arc4_hardrun(void * str, int len) {",
@@ -549,6 +569,7 @@ static const char *RTC[] = {
 	"}",
 	"",
 	"void hardening() {",
+	"#if defined(__linux__)",
 	"	prctl(PR_SET_DUMPABLE, 0);",
 	"	prctl(PR_SET_PTRACER, -1);",
 	"",
@@ -574,6 +595,7 @@ static const char *RTC[] = {
 	"		kill(getpid(), SIGKILL);",
 	"		exit(1);",
 	"	}",
+	"#endif",
 	"}",
 	"",
 	"#endif /* HARDENING */",
@@ -716,7 +738,15 @@ static const char *RTC[] = {
 	"	varg[j++] = \"busybox\";",
 	"	varg[j++] = \"sh\";",
 	"#else",
-	"	varg[j++] = argv[0];		/* My own name at execution */",
+	"	if (!FIXARGV0) {",
+	"#if defined(__APPLE__)",
+	"		varg[j++] = shll;",
+	"#else",
+	"		varg[j++] = argv[0];		/* Argv forging: use argv[0] */",
+	"#endif",
+	"	} else {",
+	"		varg[j++] = shll;		/* Interpreter path/name at execution */",
+	"	}",
 	"#endif",
 	"	setenv(\"SHC_ARGV0\", argv[0], 1);",
 	"	char pids[16]; snprintf(pids, sizeof(pids), \"%d\", getpid());",
@@ -743,18 +773,22 @@ static const char *RTC[] = {
 	"		} else {",
 	"			int	w,",
 	"				fd;",
-	"			close(0);",
-	"			close(1);",
-	"			close(2);",
 	"			fd = open(tnm, O_WRONLY);",
 	"			if (fd < 0) { _exit(1); }",
-	"			unlink(tnm);",
+	"			int devnull = open(\"/dev/null\", O_RDWR);",
+	"			if (devnull >= 0) {",
+	"				dup2(devnull, 0);",
+	"				dup2(devnull, 1);",
+	"				dup2(devnull, 2);",
+	"				if (devnull != fd && devnull > 2) close(devnull);",
+	"			}",
 	"			for (i=0, n=strlen(text); i < n; i+=w) {",
 	"				if ((w=n-i) > BUFSIZ) { w=BUFSIZ; }",
 	"				if ((w=write(fd, text+i, w)) < 0) { break; }",
 	"				memset(text+i, 0, w);",
 	"			}",
 	"			close(fd);",
+	"			unlink(tnm);",
 	"			rmdir(tdir);",
 	"			_exit(0);",
 	"		}",
@@ -785,7 +819,7 @@ static const char *RTC[] = {
 	"		varg[j++] = lsto;	/* Option meaning last option */",
 	"	}",
 	"xec:",
-	"	i = (ret > 1) ? ret : i0;	/* Args numbering correction */",
+	"	i = (ret > 1 && FIXARGV0) ? ret : i0;	/* Args numbering correction */",
 	"	while (i < argc) {",
 	"		varg[j++] = argv[i++];	/* Main run-time arguments */",
 	"	}",

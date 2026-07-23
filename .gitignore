@@ -18,3 +18,5 @@ a.out
 *.x
 *.x.c
 .DS_Store
+.markdownlintignore
+.markdownlint.json

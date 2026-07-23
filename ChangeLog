@@ -1,22 +1,30 @@
 # CHANGES - Audit & Hardening by HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
+LATEST FRI Jul 24 02:07:30 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
-LATEST MON Jun 15 23:59:23 WIB 2026 -  HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+  * Fix HTML document attributes, remove duplicate CSS selectors, and add aria-label attributes to code line anchors in man.html to resolve IDE linter warnings
+  * Create .markdownlintignore configuration to exclude plain-text license and project documentation files (COPYING, AUTHORS, ChangeLog, INSTALL, NEWS) from markdownlint checks
+  * Add # shellcheck disable=all directives to Autotools generated scripts (configure, config/compile, config/config.guess, config/config.sub, config/depcomp, config/install-sh, config/missing) to suppress linter noise
+  * Define _DEFAULT_SOURCE and _DARWIN_C_SOURCE feature test macros in src/shc.c to fix implicit mkdtemp prototype warnings on macOS/glibc under C99
+  * Guard Linux-specific <sys/prctl.h> header and prctl(2) calls in hardening() and seccomp_hardening() with #if defined(__linux__) for Darwin/macOS build compatibility
+  * Fix -P (argv forging) handling in src/shc.c so varg[0] uses argv[0] when !FIXARGV0
+  * Update test/ttest.sh for -P option assertions and prevent missing interpreters from counting as test failures
 
-	* Bump package and version to 5.0.8-Hardened-Audit-2026 in configure.ac, src/shc.c, README.md, docs/CHANGELOG.md, docs/DOCNOTE.md
-	* Expand shc -V and --version output to include original author, provider/maintainer, core collaborator, SHC contributors, repository URL, and audit hardening credit
-	* Add -V and --version options in src/shc.c to print version and exit, keeping POSIX getopt(3) compatibility without getopt_long
-	* Harden -P/-p pipe runtime by replacing predictable /tmp FIFO names with mkdtemp(3)-backed private temporary directories
-	* Add runtime PATH_MAX fallback and feature macro guards for mkdtemp(3), putenv(3), setenv(3), and strict builds in src/shc.c
-	* Replace fixed 256-byte pipe command buffer with dynamic snprintf(NULL,0,...) allocation to prevent truncation
-	* Check FIFO writer open(2), close descriptors, unlink FIFO, and remove private temp directory after pipe delivery
-	* Fix SKIP_OPTS parsing in test/ttest.sh so empty option is not skipped when SKIP_OPTS is unset
-	* Declare newly used headers/functions in configure.ac
-	* Add stricter warning flags for normal maintainer builds in src/Makefile.am
-	* Document corrected version credit in README.md, docs/CHANGELOG.md, docs/DOCNOTE.md to match ChangeLog
+MON Jun 15 23:59:23 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
+  * Bump package and version to 5.0.8-Hardened-Audit-2026 in configure.ac, src/shc.c, README.md, docs/CHANGELOG.md, docs/DOCNOTE.md
+  * Expand shc -V and --version output to include original author, provider/maintainer, core collaborator, SHC contributors, repository URL, and audit hardening credit
+  * Add -V and --version options in src/shc.c to print version and exit, keeping POSIX getopt(3) compatibility without getopt_long
+  * Harden -P/-p pipe runtime by replacing predictable /tmp FIFO names with mkdtemp(3)-backed private temporary directories
+  * Add runtime PATH_MAX fallback and feature macro guards for mkdtemp(3), putenv(3), setenv(3), and strict builds in src/shc.c
+  * Replace fixed 256-byte pipe command buffer with dynamic snprintf(NULL,0,...) allocation to prevent truncation
+  * Check FIFO writer open(2), close descriptors, unlink FIFO, and remove private temp directory after pipe delivery
+  * Fix SKIP_OPTS parsing in test/ttest.sh so empty option is not skipped when SKIP_OPTS is unset
+  * Declare newly used headers/functions in configure.ac
+  * Add stricter warning flags for normal maintainer builds in src/Makefile.am
+  * Document corrected version credit in README.md, docs/CHANGELOG.md, docs/DOCNOTE.md to match ChangeLog
 
-LATEST MON Jun 15 22:47:41 WIB 2026 -  HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+MON Jun 15 22:47:41 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
 	* src/shc.c: Bump hardened audit version to 4.0.4.
 	* src/shc.c: Harden generated -P/-p pipe runtime by replacing predictable
@@ -32,7 +40,6 @@ LATEST MON Jun 15 22:47:41 WIB 2026 -  HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUT
 	* configure.ac: Synchronize package version to 4.0.4-Hardened-Audit-2026
 	  and declare newly used headers/functions.
 	* src/Makefile.am: Add stricter warning flags for normal maintainer builds.
-
 
 MON Jun 15 22:16:33 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 

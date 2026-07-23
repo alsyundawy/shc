@@ -1,4 +1,5 @@
 #! /bin/sh
+# shellcheck disable=all
 # Common wrapper for a few potentially missing GNU and other programs.
 
 scriptversion=2026-06-15.15; # UTC

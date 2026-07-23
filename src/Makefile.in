@@ -258,6 +258,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+AM_CPPFLAGS = -D_POSIX_C_SOURCE=200809L
+AM_CFLAGS = -Wall -Wextra -Wpedantic -Wformat=2
 shc_SOURCES = shc.c
 all: all-am
 

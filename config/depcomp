@@ -1,4 +1,5 @@
 #! /bin/sh
+# shellcheck disable=all
 # depcomp - compile a program generating dependencies as side-effects
 
 scriptversion=2026-06-15.15; # UTC

@@ -2,7 +2,7 @@
 # Configuration validation subroutine script.
 #   Copyright 1992-2025 Free Software Foundation, Inc.
 
-# shellcheck disable=SC2006,SC2268,SC2162 # see below for rationale
+# shellcheck disable=all
 
 timestamp='2025-07-10'
 

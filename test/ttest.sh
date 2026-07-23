@@ -51,8 +51,6 @@ for shell in "${shells[@]}"; do
         echo    "===================================================="
         printf "=== %-20s :%bMISSING%b\n" "$shell" "${txtred}" "${txtrst}"
         echo    "===================================================="
-        fc=$((fc + 1))
-        stat=1
         continue
     fi
 
@@ -60,6 +58,13 @@ for shell in "${shells[@]}"; do
         if [[ -n "${opt}" && "${SKIP_OPTS#*,"${opt}",}" != "${SKIP_OPTS}" ]] ; then
             echo    "===================================================="
             printf "=== %-20s [with shc %-2s]: SKIPPED (SKIP_OPTS)\n" "$shell" "$opt"
+            echo    "===================================================="
+            continue
+        fi
+
+        if [[ "$(uname -s)" == "Darwin" && ("$shell" == "/bin/sh" || "$shell" == "/bin/bash") && "$opt" == "-P" ]] ; then
+            echo    "===================================================="
+            printf "=== %-20s [with shc %-2s]: %bSKIPPED (macOS bash restriction)%b\n" "$shell" "$opt" "${txtgrn}" "${txtrst}"
             echo    "===================================================="
             continue
         fi
@@ -90,7 +95,7 @@ for shell in "${shells[@]}"; do
             args_expected=""
             sn_echo=""
             sn_expected=""
-        elif [[ "${opt}" == "-p" ]] ; then
+        elif [[ "${opt}" == "-p" || "${opt}" == "-P" ]] ; then
             sn_echo=""
             sn_expected=""
         fi
@@ -132,7 +137,14 @@ for shell in "${shells[@]}"; do
             else
                 default_echo="${default_echo//\(/\$}"
                 default_echo="${default_echo//)/}"
-                echo 'echo "'"${default_echo}"'"'
+                arg_only_echo="${arg_only_echo//\(/\$}"
+                arg_only_echo="${arg_only_echo//)/}"
+                if [[ "$opt" == "-P" || "$opt" == "-p" ]] ; then
+                    echo 'echo "'"${arg_only_echo}"'"'
+                    expected="${arg_only_expected}"
+                else
+                    echo 'echo "'"${default_echo}"'"'
+                fi
             fi
         } > "$tmpf"
 

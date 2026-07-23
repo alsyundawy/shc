@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc 3.10" />
@@ -12,6 +12,7 @@
     html {
       color: #1a1a1a;
       background-color: #fdfdfd;
+      -webkit-text-size-adjust: 100%;
     }
     body {
       margin: 0 auto;
@@ -174,11 +175,9 @@
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
     /* CSS for syntax highlighting */
-    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
     pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -204,8 +203,6 @@
         color: #aaaaaa;
       }
     pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      {   }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
@@ -223,7 +220,6 @@
     code span.dt { color: #902000; } /* DataType */
     code span.dv { color: #40a070; } /* DecVal */
     code span.er { color: #ff0000; font-weight: bold; } /* Error */
-    code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
     code span.im { color: #008000; font-weight: bold; } /* Import */
@@ -398,14 +394,14 @@ Linker flags <code>[none]</code>
 <p>Compile a script which can be run on other systems with the trace
 option enabled (without <code>-U</code> flag):</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">shc</span> <span class="at">-f</span> myscript <span class="at">-o</span> mybinary</span></code></pre></div>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1" aria-label="Line 1"></a><span class="ex">shc</span> <span class="at">-f</span> myscript <span class="at">-o</span> mybinary</span></code></pre></div>
 <p>Compile an untraceable binary:</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">shc</span> <span class="at">-Uf</span> myscript <span class="at">-o</span> mybinary</span></code></pre></div>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1" aria-label="Line 1"></a><span class="ex">shc</span> <span class="at">-Uf</span> myscript <span class="at">-o</span> mybinary</span></code></pre></div>
 <p>Compile an untraceable binary that doesn’t require root access
 (experimental):</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">shc</span> <span class="at">-Hf</span> myscript <span class="at">-o</span> mybinary</span></code></pre></div>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1" aria-label="Line 1"></a><span class="ex">shc</span> <span class="at">-Hf</span> myscript <span class="at">-o</span> mybinary</span></code></pre></div>
 <h2 id="limitations">LIMITATIONS</h2>
 <p>The maximum size of the script that could be executed once compiled
 is limited by the operating system configuration parameter
