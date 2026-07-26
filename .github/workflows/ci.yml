@@ -2,9 +2,6 @@ name: CI
 
 on: [push, pull_request]
 
-permissions:
-  contents: read
-
 jobs:
   build-and-test:
     # Normally runs in less than 50 seconds, but could stall because of test
@@ -16,12 +13,11 @@ jobs:
       uses: actions/checkout@v7
 
     - name: Install dependencies
-      run: sudo apt-get update -q && sudo apt install -y dash bash ksh zsh tcsh csh rc shellcheck dos2unix
+      run: sudo apt-get update -q && sudo apt install -y dash bash ksh zsh tcsh csh rc
 
     - name: Build and Test (with sanitize)
       env:
         SKIP: python2
-        SKIP_OPTS: -H
       run: |
         SANITIZE="${SANITIZE} -fsanitize=address"
         #SANITIZE="${SANITIZE} -fsanitize=thread"
