@@ -44,21 +44,19 @@ static const struct {
 #if defined(__GNUC__) || defined(__clang__)
 __attribute__((unused))
 #endif
-static const struct {
-  const char *f, *s, *e;
-} original_author = {"Francisco", "Garcia", "<frosal@fi.upm.es>"};
+static const char *original_author[] = {"Francisco", "Garcia",
+                                        "<frosal@fi.upm.es>"};
 
 static const char *version_credits[] = {
-	"License             : GNU GPL Version 3",
-	"Original author     : Francisco Garcia <frosal@fi.upm.es>",
-	"Provider/Maintainer : Md Jahidul Hamid <jahidulhamid@yahoo.com>",
-	"Core collaborator   : @mdeweerd and SHC contributors",
-	"Audit & Hardening   : HARRY DS ALSYUNDAWY <alsyundawy@gmail.com>",
-	"Organization        : ALSYUNDAWY IT SOLUTION (2026)",
-	"Website             : https://alsyundawy.com",
-	"Repository          : https://github.com/alsyundawy/shc",
-	0
-};
+    "License             : GNU GPL Version 3",
+    "Original author     : Francisco Garcia <frosal@fi.upm.es>",
+    "Provider/Maintainer : Md Jahidul Hamid <jahidulhamid@yahoo.com>",
+    "Core collaborator   : @mdeweerd and SHC contributors",
+    "Audit & Hardening   : HARRY DS ALSYUNDAWY <alsyundawy@gmail.com>",
+    "Organization        : ALSYUNDAWY IT SOLUTION (2026)",
+    "Website             : https://alsyundawy.com",
+    "Repository          : https://github.com/alsyundawy/shc",
+    0};
 
 /*This is the original author who first came up with this*/
 
@@ -154,7 +152,7 @@ static const char *help[] = {
 
 #define SIZE 4096
 
-static char *file;
+static const char *file;
 static char *file2;
 static char date[21];
 static const char *mail = "Please contact your provider";
@@ -216,31 +214,34 @@ static const char *RTC[] = {
     "\"	char **newargv = malloc((argc+1)*sizeof(*argv));\",",
     "\"	char *from,*to;\",", "\"	int i,len;\",", "\"\",",
     "\"	for (i = 0; i<argc; i++) {\",", "\"		from = argv[i];\",",
-    "\"		len = strlen(from)+1;\",",
-    "\"		to = malloc(len);\",", "\"		memcpy(to,from,len);\",",
+    "\"		len = strlen(from)+1;\",", "\"		to = malloc(len);\",",
+    "\"		memcpy(to,from,len);\",",
     "\"		// zap old argv space\",",
     "\"		memset(from,'\\\\0',len);\",",
-    "\"		newargv[i] = to;\",", "\"		argv[i] = 0;\",",
-    "\"	}\",", "\"	newargv[argc] = 0;\",", "\"	return newargv;\",",
-    "\"}\",", "\"\",",
+    "\"		newargv[i] = to;\",", "\"		argv[i] = 0;\",", "\"	}\",",
+    "\"	newargv[argc] = 0;\",", "\"	return newargv;\",", "\"}\",", "\"\",",
     "\"static int mymain(int argc, char** argv, char** env) {\",",
     "\"	//fprintf(stderr, \\\"Inject main argc = %d\\\\n\\\", argc);\",",
     "\"	return real_main(argc, copyargs(argc,argv), env);\",", "\"}\",",
     "\"\",",
-    "\"int __libc_start_main(int (*main) (int, char**, char**), int argc, char **argv, void (*init) (void), void (*fini)(void), void (*rtld_fini)(void), void (*stack_end)) {\",",
+    "\"int __libc_start_main(int (*main) (int, char**, char**), int argc, char \",",
+    "\"**argv, void (*init) (void), void (*fini)(void), void (*rtld_fini)(void), \",",
+    "\"void (*stack_end)) {\",",
     "\"	static int (*real___libc_start_main)() = NULL;\",", "\"	int n;\",",
     "\"\",", "\"	if (!real___libc_start_main) {\",",
-    "\"		real___libc_start_main = dlsym(RTLD_NEXT, \\\"__libc_start_main\\\");\",",
-    "\"		if (!real___libc_start_main) abort();\",", "\"	}\",",
-    "\"\",", "\"	n = read(21, secret, sizeof(secret));\",",
-    "\"	if (n > 0) {\",", "\"		int i;\",", "\"\",",
+    "\"		real___libc_start_main = dlsym(RTLD_NEXT, "
+    "\\\"__libc_start_main\\\");\",",
+    "\"		if (!real___libc_start_main) abort();\",", "\"	}\",", "\"\",",
+    "\"	n = read(21, secret, sizeof(secret));\",", "\"	if (n > 0) {\",",
+    "\"		int i;\",", "\"\",",
     "\"		if (secret[n - 1] == '\\\\n') { secret[--n] = '\\\\0'; }\",",
     "\"		for (i = 1; i < argc; i++) {\",",
     "\"			if (strcmp(argv[i], PLACEHOLDER) == 0) {\",",
     "\"				argv[i] = secret;\",",
     "\"			}\",", "\"		}\",", "\"	}\",", "\"\",",
     "\"	real_main = main;\",", "\"\",",
-    "\"	return real___libc_start_main(mymain, argc, argv, init, fini, rtld_fini, stack_end);\",",
+    "\"	return real___libc_start_main(mymain, argc, argv, init, fini, "
+    "rtld_fini, stack_end);\",",
     "\"}\",", "\"\",", "0};", "#endif /* HARDENING */", "", "/* rtc.c */", "",
     "#ifndef _GNU_SOURCE", "#define _GNU_SOURCE", "#endif",
     "#ifndef _DEFAULT_SOURCE", "#define _DEFAULT_SOURCE", "#endif",
@@ -259,13 +260,12 @@ static const char *RTC[] = {
     "void key(void * str, int len) {",
     "	unsigned char tmp, * ptr = (unsigned char *)str;",
     "	while (len > 0) {", "		do {",
-    "			tmp = stte[indx];",
-    "			kndx += tmp;",
+    "			tmp = stte[indx];", "			kndx += tmp;",
     "			kndx += ptr[(int)indx % len];",
     "			stte[indx] = stte[kndx];",
     "			stte[kndx] = tmp;", "		} while (++indx);",
-    "		ptr += 256;", "		len -= 256;", "	}", "}", "",
-    "/*", " * Encrypt data.", " */", "void arc4(void * str, int len) {",
+    "		ptr += 256;", "		len -= 256;", "	}", "}", "", "/*",
+    " * Encrypt data.", " */", "void arc4(void * str, int len) {",
     "	unsigned char tmp, * ptr = (unsigned char *)str;",
     "	while (len > 0) {", "		indx++;",
     "		tmp = stte[indx];", "		jndx += tmp;",
@@ -318,14 +318,13 @@ static const char *RTC[] = {
     "		indx++;", "		tmp = stte[indx];",
     "		jndx += tmp;", "		stte[indx] = stte[jndx];",
     "		stte[jndx] = tmp;", "		tmp += stte[indx];",
-    "		*ptr ^= stte[tmp];", "		ptr++;",
-    "		len--;", "	}", "", "	_UNUSED_R(system(tmp2));",
-    "	memset(tmp2, 0, strlen(tmp2));", "	free(tmp2);",
-    "	exit(0);", "}", "#endif /* HARDENING */", "", "/*",
-    " * Key with file invariants.", " */", "int key_with_file(char * file) {",
-    "	struct stat statf[1];", "	struct stat control[1];", "",
-    "	if (stat(file, statf) < 0)", "		return -1;", "",
-    "	/* Turn on stable fields */",
+    "		*ptr ^= stte[tmp];", "		ptr++;", "		len--;",
+    "	}", "", "	_UNUSED_R(system(tmp2));",
+    "	memset(tmp2, 0, strlen(tmp2));", "	free(tmp2);", "	exit(0);", "}",
+    "#endif /* HARDENING */", "", "/*", " * Key with file invariants.", " */",
+    "int key_with_file(char * file) {", "	struct stat statf[1];",
+    "	struct stat control[1];", "", "	if (stat(file, statf) < 0)",
+    "		return -1;", "", "	/* Turn on stable fields */",
     "	memset(control, 0, sizeof(control));",
     "	control->st_ino = statf->st_ino;",
     "	control->st_dev = statf->st_dev;",
@@ -342,16 +341,16 @@ static const char *RTC[] = {
     "	fprintf(stderr, \"argc=%d\\n\", argc);", "	if (!argv) {",
     "		fprintf(stderr, \"argv=<null>\\n\");", "	} else {",
     "		for (i = 0; i <= argc ; i++) {",
-    "			fprintf(stderr, \"argv[%d]=%s\\n\", i, argv[i] ? argv[i] : \"<null>\");",
+    "			fprintf(stderr, \"argv[%d]=%s\\n\", i, argv[i] ? "
+    "argv[i] : \"<null>\");",
     "		}", "	}", "}", "#endif /* DEBUGEXEC */", "",
     "void rmarg(char ** argv, char * arg) {",
     "	for (; argv && *argv && *argv != arg; argv++) {}",
     "	for (; argv && *argv; argv++)", "		*argv = argv[1];", "}",
     "", "void chkenv_end(void);", "", "int chkenv(int argc) {",
-    "	char buff[512];", "	unsigned long mask, m;",
-    "	int l, a, c;", "	char * string;",
-    "	extern char ** environ;", "", "	mask = (unsigned long)getpid();",
-    "	stte_0();",
+    "	char buff[512];", "	unsigned long mask, m;", "	int l, a, c;",
+    "	char * string;", "	extern char ** environ;", "",
+    "	mask = (unsigned long)getpid();", "	stte_0();",
     "	 key(&chkenv, (void*)&chkenv_end - (void*)&chkenv);",
     "	 key(&data, sizeof(data));", "	 key(&mask, sizeof(mask));",
     "	arc4(&mask, sizeof(mask));",
@@ -366,8 +365,8 @@ static const char *RTC[] = {
     "	c = sscanf(string, \"%lu %d%c\", &m, &a, buff);",
     "	if (c == 2 && m == mask) {", "		/* 3rd */",
     "		rmarg(environ, &string[-l - 1]);",
-    "		return 1 + (argc - a);", "	}", "	return -1;", "}",
-    "", "void chkenv_end(void) {}", "", "#if HARDENING", "",
+    "		return 1 + (argc - a);", "	}", "	return -1;", "}", "",
+    "void chkenv_end(void) {}", "", "#if HARDENING", "",
     "static void gets_process_name(const pid_t pid, char * name, size_t "
     "name_len) {",
     "	char procfile[BUFSIZ];",
@@ -399,17 +398,17 @@ static const char *RTC[] = {
     "	    && (strcmp(name, \"/bin/kdesu\") != 0)",
     "	    && (strcmp(name, \"/usr/bin/kdesu\") != 0)", "	) {",
     "		printf(\"Operation not permitted\\n\");",
-    "		kill(getpid(), SIGKILL);", "		exit(1);",
-    "	}", "#endif", "}", "", "#endif /* HARDENING */", "", "#if !TRACEABLE",
-    "", "#define _LINUX_SOURCE_COMPAT", "#include <sys/ptrace.h>",
+    "		kill(getpid(), SIGKILL);", "		exit(1);", "	}",
+    "#endif", "}", "", "#endif /* HARDENING */", "", "#if !TRACEABLE", "",
+    "#define _LINUX_SOURCE_COMPAT", "#include <sys/ptrace.h>",
     "#include <sys/types.h>", "#include <sys/wait.h>", "#include <fcntl.h>",
     "#include <signal.h>", "#include <stdio.h>", "#include <unistd.h>", "",
     "#if !defined(PT_ATTACHEXC) /* New replacement for PT_ATTACH */",
     "	#if !defined(PTRACE_ATTACH) && defined(PT_ATTACH)",
     "		#define PT_ATTACHEXC	PT_ATTACH",
     "	#elif defined(PTRACE_ATTACH)",
-    "		#define PT_ATTACHEXC PTRACE_ATTACH", "	#endif", "#endif",
-    "", "void untraceable(char * argv0) {", "	char proc[80];",
+    "		#define PT_ATTACHEXC PTRACE_ATTACH", "	#endif", "#endif", "",
+    "void untraceable(char * argv0) {", "	char proc[80];",
     "	int pid, mine;", "", "	switch(pid = fork()) {",
     "	case  0:", "		pid = getppid();",
     "		/* For problematic SunOS ptrace */", "#if defined(__FreeBSD__)",
@@ -429,43 +428,40 @@ static const char *RTC[] = {
     "			ptrace(PTRACE_DETACH, pid, 0, 0);", "		}",
     "		_exit(mine);", "	case -1:", "		break;",
     "	default:", "		if (pid == waitpid(pid, 0, 0)) {",
-    "			return;", "		}", "	}",
-    "	perror(argv0);", "	_exit(1);", "}", "#endif /* !TRACEABLE */", "",
+    "			return;", "		}", "	}", "	perror(argv0);",
+    "	_exit(1);", "}", "#endif /* !TRACEABLE */", "",
     "char * xsh(int argc, char ** argv) {", "	char * scrpt;",
     "	int ret, i, j;", "	char ** varg;", "	char * me = argv[0];",
     "	if (me == NULL) { me = getenv(\"_\"); }",
     "	if (me == 0) { fprintf(stderr, \"E: neither argv[0] nor $_ works.\"); "
     "exit(1); }",
-    "", "	ret = chkenv(argc);", "	stte_0();",
-    "	 key(pswd, pswd_z);", "	arc4(msg1, msg1_z);",
-    "	arc4(date, date_z);",
+    "", "	ret = chkenv(argc);", "	stte_0();", "	 key(pswd, pswd_z);",
+    "	arc4(msg1, msg1_z);", "	arc4(date, date_z);",
     "	if (date[0] && (atoll(date) < time(NULL))) {",
     "		return msg1;", "	}", "	arc4(shll, shll_z);",
-    "	arc4(inlo, inlo_z);", "	arc4(pfmt, pfmt_z);",
-    "	arc4(xecc, xecc_z);", "	arc4(lsto, lsto_z);",
-    "	arc4(opts, opts_z);", "	arc4(tst1, tst1_z);",
+    "	arc4(inlo, inlo_z);", "	arc4(pfmt, pfmt_z);", "	arc4(xecc, xecc_z);",
+    "	arc4(lsto, lsto_z);", "	arc4(opts, opts_z);", "	arc4(tst1, tst1_z);",
     "	 key(tst1, tst1_z);", "	arc4(chk1, chk1_z);",
     "	if ((chk1_z != tst1_z) || memcmp(tst1, chk1, tst1_z)) {",
     "		return tst1;", "	}", "	arc4(msg2, msg2_z);",
     "	if (ret < 0) {", "		return msg2;", "	}",
-    "	varg = (char **)calloc(argc + 10, sizeof(char *));",
-    "	if (!varg) {", "		return 0;", "	}",
-    "	if (ret) {", "		arc4(rlax, rlax_z);",
+    "	varg = (char **)calloc(argc + 10, sizeof(char *));", "	if (!varg) {",
+    "		return 0;", "	}", "	if (ret) {",
+    "		arc4(rlax, rlax_z);",
     "		if (!rlax[0] && key_with_file(shll)) {",
     "			free(varg);", "			return shll;",
     "		}", "#if HARDENING", "	    arc4_hardrun(text, text_z);",
     "	    exit(0);", "       /* Seccomp Sandboxing - Start */",
-    "       seccomp_hardening();", "#endif",
-    "		arc4(text, text_z);", "		arc4(tst2, tst2_z);",
-    "		 key(tst2, tst2_z);", "		arc4(chk2, chk2_z);",
+    "       seccomp_hardening();", "#endif", "		arc4(text, text_z);",
+    "		arc4(tst2, tst2_z);", "		 key(tst2, tst2_z);",
+    "		arc4(chk2, chk2_z);",
     "		if ((chk2_z != tst2_z) || memcmp(tst2, chk2, tst2_z)) {",
     "			free(varg);", "			return tst2;",
     "		}",
     "		/* Prepend hide_z spaces to script text to hide it. */",
-    "		scrpt = malloc(hide_z + text_z);",
-    "		if (!scrpt) {", "			free(varg);",
-    "			return 0;", "		}",
-    "		memset(scrpt, (int) ' ', hide_z);",
+    "		scrpt = malloc(hide_z + text_z);", "		if (!scrpt) {",
+    "			free(varg);", "			return 0;",
+    "		}", "		memset(scrpt, (int) ' ', hide_z);",
     "		memcpy(&scrpt[hide_z], text, text_z);",
     "	} else {			/* Reexecute */",
     "		if (*xecc) {", "			scrpt = malloc(512);",
@@ -473,11 +469,10 @@ static const char *RTC[] = {
     "				free(varg);",
     "				return 0;", "			}",
     "			snprintf(scrpt, 512, xecc, me);",
-    "		} else {", "			scrpt = me;",
-    "		}", "	}", "	j = 0;", "#if BUSYBOXON",
-    "	varg[j++] = \"busybox\";", "	varg[j++] = \"sh\";", "#else",
-    "	if (!FIXARGV0) {", "#if defined(__APPLE__)",
-    "		varg[j++] = shll;", "#else",
+    "		} else {", "			scrpt = me;", "		}",
+    "	}", "	j = 0;", "#if BUSYBOXON", "	varg[j++] = \"busybox\";",
+    "	varg[j++] = \"sh\";", "#else", "	if (!FIXARGV0) {",
+    "#if defined(__APPLE__)", "		varg[j++] = shll;", "#else",
     "		varg[j++] = argv[0];		/* Argv forging: use argv[0] "
     "*/",
     "#endif", "	} else {",
@@ -488,8 +483,7 @@ static const char *RTC[] = {
     "	setenv(\"SHC_PID\", pids, 1);", "	char 	tnm[PATH_MAX];",
     "	char 	tdir[PATH_MAX];", "	char	i0 = 0;",
     "	if (PIPESCRIPT && ret) {",
-    "		const char *tmpbase = getenv(\"TMPDIR\");",
-    "		int n;",
+    "		const char *tmpbase = getenv(\"TMPDIR\");", "		int n;",
     "		if (!tmpbase || !*tmpbase) { tmpbase = \"/tmp\"; }",
     "		n = snprintf(tdir, sizeof(tdir), \"%s/shc.%d.XXXXXX\", "
     "tmpbase, (int)getpid());",
@@ -501,10 +495,9 @@ static const char *RTC[] = {
     "			rmdir(tdir);", "			exit(1);",
     "		}", "		if ((i=fork())) {",
     "			if (i < 0) { unlink(tnm); rmdir(tdir); exit(1); }",
-    "			waitpid(i, 0, 0);",
-    "		} else if (fork()) {", "			_exit(0);",
-    "		} else {", "			int	w,",
-    "				fd;",
+    "			waitpid(i, 0, 0);", "		} else if (fork()) {",
+    "			_exit(0);", "		} else {",
+    "			int	w,", "				fd;",
     "			fd = open(tnm, O_WRONLY);",
     "			if (fd < 0) { _exit(1); }",
     "			int devnull = open(\"/dev/null\", O_RDWR);",
@@ -543,20 +536,19 @@ static const char *RTC[] = {
     "*/",
     "	while (i < argc) {",
     "		varg[j++] = argv[i++];	/* Main run-time arguments */",
-    "	}",
-    "	varg[j] = 0;			/* NULL terminated array */",
+    "	}", "	varg[j] = 0;			/* NULL terminated array */",
     "#if DEBUGEXEC", "	debugexec(shll, j, varg);", "#endif",
     "	execvp(shll, varg);", "	return shll;", "}", "",
     "int main(int argc, char ** argv) {", "#if SETUID",
     "	_UNUSED_R(setuid(0));", "#endif", "#if DEBUGEXEC",
     "	debugexec(\"main\", argc, argv);", "#endif", "#if HARDENING",
-    "	hardening();", "#endif", "#if !TRACEABLE",
-    "	untraceable(argv[0]);", "#endif", "	argv[1] = xsh(argc, argv);",
+    "	hardening();", "#endif", "#if !TRACEABLE", "	untraceable(argv[0]);",
+    "#endif", "	argv[1] = xsh(argc, argv);",
     "	fprintf(stderr, \"%s%s%s: %s\\n\", argv[0],",
     "		errno ? \": \" : \"\",",
     "		errno ? strerror(errno) : \"\",",
-    "		argv[1] ? argv[1] : \"<null>\"", "	);",
-    "	return 1;", "}", 0};
+    "		argv[1] ? argv[1] : \"<null>\"", "	);", "	return 1;", "}",
+    0};
 
 static char *xstrdup(const char *src) {
   char *dst;
@@ -566,7 +558,7 @@ static char *xstrdup(const char *src) {
     return NULL;
   }
   len = strlen(src) + 1;
-  dst = malloc(len);
+  dst = (char *)malloc(len);
   if (!dst) {
     return NULL;
   }
@@ -587,7 +579,7 @@ static int append_suffix(char **dst, const char *suffix) {
   if (suffix_len > ((size_t)-1) - base_len - 1) {
     return -1;
   }
-  tmp = realloc(*dst, base_len + suffix_len + 1);
+  tmp = (char *)realloc(*dst, base_len + suffix_len + 1);
   if (!tmp) {
     return -1;
   }
@@ -631,7 +623,7 @@ static int argv_builder_reserve(struct argv_builder *b, size_t need) {
     }
     new_cap *= 2;
   }
-  tmp = realloc(b->argv, new_cap * sizeof(*tmp));
+  tmp = (char **)realloc(b->argv, new_cap * sizeof(*tmp));
   if (!tmp) {
     return -1;
   }
@@ -715,7 +707,7 @@ static int split_words_append(struct argv_builder *b, const char *input) {
         }
         new_cap *= 2;
       }
-      tmp = realloc(word, new_cap);
+      tmp = (char *)realloc(word, new_cap);
       if (!tmp) {
         free(word);
         return -1;
@@ -806,7 +798,7 @@ static int build_default_output_name(void) {
   if (len > ((size_t)-1) - 3) {
     return -1;
   }
-  tmp = malloc(len + 3);
+  tmp = (char *)malloc(len + 3);
   if (!tmp) {
     return -1;
   }
@@ -831,9 +823,9 @@ static void print_version(FILE *out) {
 static int parse_an_arg(int argc, char *argv[]) {
   extern char *optarg;
   extern int optind;
-  const char *opts = "e:m:i:x:l:o:f:2ABCDhHpPrSUVv";
+  const char *opt_flags = "e:m:i:x:l:o:f:2ABCDhHpPrSUVv";
   struct tm tmp[1];
-  time_t expdate;
+  time_t expdate = 0;
   int cnt, l;
   char ctrl;
 
@@ -842,7 +834,7 @@ static int parse_an_arg(int argc, char *argv[]) {
     exit(0);
   }
 
-  switch (getopt(argc, argv, opts)) {
+  switch (getopt(argc, argv, opt_flags)) {
   case 'e':
     memset(tmp, 0, sizeof(tmp));
     cnt = sscanf(optarg, "%2d/%2d/%4d%c", &tmp->tm_mday, &tmp->tm_mon,
@@ -914,7 +906,6 @@ static int parse_an_arg(int argc, char *argv[]) {
   case 'V':
     print_version(stdout);
     exit(0);
-    break;
   case 'S':
     SETUID_flag = 1;
     break;
@@ -945,7 +936,6 @@ static int parse_an_arg(int argc, char *argv[]) {
     }
     fprintf(stderr, "    %s %s %s\n\n", provider.f, provider.s, provider.e);
     exit(0);
-    break;
   case 'A':
     fprintf(stderr, "%s %s, %s\n", my_name, version, subject);
     fprintf(stderr, "%s %s %s %s %s\n", my_name, cpright, provider.f,
@@ -955,7 +945,6 @@ static int parse_an_arg(int argc, char *argv[]) {
       fprintf(stderr, "%s\n", abstract[l]);
     }
     exit(0);
-    break;
   case 'h':
     fprintf(stderr, "%s %s, %s\n", my_name, version, subject);
     fprintf(stderr, "%s %s %s %s %s\n", my_name, cpright, provider.f,
@@ -965,7 +954,6 @@ static int parse_an_arg(int argc, char *argv[]) {
       fprintf(stderr, "%s\n", help[l]);
     }
     exit(0);
-    break;
   case -1:
     if (!file) {
       fprintf(stderr, "%s parse: Must specify SCRIPT name argument -f\n",
@@ -1026,25 +1014,27 @@ static unsigned char stte[256], indx, jndx, kndx;
 /*
  * Reset arc4 stte.
  */
-void stte_0(void) {
+static void stte_0(void) {
   indx = jndx = kndx = 0;
   do {
     stte[indx] = indx;
+    // cppcheck-suppress knownConditionTrueFalse
   } while (++indx);
 }
 
 /*
  * Set key. Can be used more than once.
  */
-void key(void *str, int len) {
-  unsigned char tmp, *ptr = (unsigned char *)str;
+static void key(void *str, int len) {
+  unsigned char *ptr = (unsigned char *)str;
   while (len > 0) {
     do {
-      tmp = stte[indx];
+      unsigned char tmp = stte[indx];
       kndx += tmp;
       kndx += ptr[(int)indx % len];
       stte[indx] = stte[kndx];
       stte[kndx] = tmp;
+      // cppcheck-suppress knownConditionTrueFalse
     } while (++indx);
     ptr += 256;
     len -= 256;
@@ -1054,7 +1044,7 @@ void key(void *str, int len) {
 /*
  * Encrypt data.
  */
-void arc4(void *str, int len) {
+static void arc4(void *str, int len) {
   unsigned char *ptr = (unsigned char *)str;
   while (len > 0) {
     unsigned char tmp;
@@ -1075,11 +1065,11 @@ void arc4(void *str, int len) {
 /*
  * Key with file invariants.
  */
-int key_with_file(char *file) {
+static int key_with_file(const char *filename) {
   struct stat statf[1];
   struct stat control[1];
 
-  if (stat(file, statf) < 0) {
+  if (stat(filename, statf) < 0) {
     return -1;
   }
 
@@ -1146,20 +1136,22 @@ static const struct shell_entry {
     {NULL, NULL, NULL, NULL, NULL},
 };
 
-int eval_shell(char *text) {
-  int i;
+static int eval_shell(const char *script_text) {
+  size_t line_len;
+  int matches;
+  const char *nl;
   char *ptr;
   char *tmp_realloc;
 
-  ptr = strchr(text, (int)'\n');
-  if (!ptr) {
-    i = strlen(text);
+  nl = strchr(script_text, (int)'\n');
+  if (!nl) {
+    line_len = strlen(script_text);
   } else {
-    i = ptr - text;
+    line_len = (size_t)(nl - script_text);
   }
-  ptr = malloc(i + 1);
-  shll = malloc(i + 1);
-  opts = malloc(i + 1);
+  ptr = (char *)malloc(line_len + 1);
+  shll = (char *)malloc(line_len + 1);
+  opts = (char *)malloc(line_len + 1);
   if (!ptr || !shll || !opts) {
     if (ptr)
       free(ptr);
@@ -1169,14 +1161,14 @@ int eval_shell(char *text) {
       free(opts);
     return -1;
   }
-  strncpy(ptr, text, i);
-  ptr[i] = '\0';
+  strncpy(ptr, script_text, line_len);
+  ptr[line_len] = '\0';
 
   *opts = '\0';
   {
     char scanfmt[64];
     int nfmt;
-    nfmt = snprintf(scanfmt, sizeof(scanfmt), " #!%%%ds %%%d[^\n]", i, i);
+    nfmt = snprintf(scanfmt, sizeof(scanfmt), " #!%%%zus %%%zus[^\n]", line_len, line_len);
     if (nfmt < 0 || (size_t)nfmt >= sizeof(scanfmt)) {
       free(ptr);
       return -1;
@@ -1186,19 +1178,19 @@ int eval_shell(char *text) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
-    i = sscanf(ptr, scanfmt, shll, opts);
+    matches = sscanf(ptr, scanfmt, shll, opts);
 #if defined(__GNUC__) || defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
   }
-  if ((i < 1) || (i > 2)) {
+  if ((matches < 1) || (matches > 2)) {
     fprintf(stderr, "%s: invalid first line in script: %s\n", my_name, ptr);
     free(ptr);
     return -1;
   }
   free(ptr);
 
-  tmp_realloc = realloc(shll, strlen(shll) + 1);
+  tmp_realloc = (char *)realloc(shll, strlen(shll) + 1);
   if (!tmp_realloc) {
     fprintf(stderr, "%s: Realloc issue\n", my_name);
     free(shll);
@@ -1217,19 +1209,19 @@ int eval_shell(char *text) {
     fprintf(stderr, "%s: shll=%s\n", my_name, ptr);
   }
 
-  for (i = 0; shellsDB[i].shll; i++) {
-    if (!strcmp(ptr, shellsDB[i].shll)) {
+  for (int idx = 0; shellsDB[idx].shll; idx++) {
+    if (!strcmp(ptr, shellsDB[idx].shll)) {
       if (!inlo) {
-        inlo = xstrdup(shellsDB[i].inlo);
+        inlo = xstrdup(shellsDB[idx].inlo);
       }
       if (!pfmt) {
-        pfmt = xstrdup(shellsDB[i].pfmt);
+        pfmt = xstrdup(shellsDB[idx].pfmt);
       }
       if (!xecc) {
-        xecc = xstrdup(shellsDB[i].xecc);
+        xecc = xstrdup(shellsDB[idx].xecc);
       }
       if (!lsto) {
-        lsto = xstrdup(shellsDB[i].lsto);
+        lsto = xstrdup(shellsDB[idx].lsto);
       }
       if (!inlo || !pfmt || !xecc || !lsto) {
         return -1;
@@ -1251,7 +1243,7 @@ int eval_shell(char *text) {
     fprintf(stderr, "%s [-l]=%s\n", my_name, lsto);
   }
 
-  tmp_realloc = realloc(opts, strlen(opts) + 1);
+  tmp_realloc = (char *)realloc(opts, strlen(opts) + 1);
   if (!tmp_realloc) {
     free(opts);
     return -1;
@@ -1271,31 +1263,32 @@ int eval_shell(char *text) {
   return 0;
 }
 
-char *read_script(char *file) {
+static char *read_script(const char *filename) {
   FILE *i;
   char *l_text;
   char *tmp_realloc;
-  size_t cnt;
   size_t l;
   long arg_max;
 
-  l_text = malloc(SIZE);
+  l_text = (char *)malloc(SIZE);
   if (!l_text) {
     return NULL;
   }
-  i = fopen(file, "r");
+  i = fopen(filename, "r");
   if (!i) {
     free(l_text);
     return NULL;
   }
   for (l = 0;;) {
+    size_t cnt;
+
     if (l > ((size_t)-1) - SIZE - 1) {
       free(l_text);
       fclose(i);
       errno = EOVERFLOW;
       return NULL;
     }
-    tmp_realloc = realloc(l_text, l + SIZE);
+    tmp_realloc = (char *)realloc(l_text, l + SIZE);
     if (!tmp_realloc) {
       free(l_text);
       fclose(i);
@@ -1314,7 +1307,7 @@ char *read_script(char *file) {
     l += cnt;
     if (l > (size_t)INT_MAX - (1U << 12) - 1U) {
       fprintf(stderr, "%s: script too large for generated C runtime: %s\n",
-              my_name, file);
+              my_name, filename);
       free(l_text);
       fclose(i);
       errno = EOVERFLOW;
@@ -1322,7 +1315,7 @@ char *read_script(char *file) {
     }
   }
   fclose(i);
-  tmp_realloc = realloc(l_text, l + 1);
+  tmp_realloc = (char *)realloc(l_text, l + 1);
   if (!tmp_realloc) {
     free(l_text);
     return NULL;
@@ -1342,26 +1335,25 @@ char *read_script(char *file) {
             "   In the current System the call sysconf(_SC_ARG_MAX) returns "
             "%ld bytes\n"
             "   and your script \"%s\" is %zu bytes length.\n",
-            my_name, arg_max, file, l);
+            my_name, arg_max, filename, l);
   }
   return l_text;
 }
 
-unsigned rand_mod(unsigned mod) {
+static unsigned rand_mod(unsigned mod) {
   /* Without skew */
-  unsigned rnd, top = RAND_MAX;
+  unsigned rnd, top = (unsigned)RAND_MAX;
   top -= top % mod;
-  while (top <= (rnd = rand())) { // NOLINT
-    continue;
+  while (top <= (rnd = (unsigned)rand())) { // NOLINT
   }
   /* Using high-order bits. */
-  rnd = 1.0 * mod * rnd / (1.0 + top);
+  rnd = (unsigned)(1.0 * mod * rnd / (1.0 + top));
   return rnd;
 }
 
-char rand_chr(void) { return (char)rand_mod(1 << (sizeof(char) << 3)); }
+static char rand_chr(void) { return (char)rand_mod(1U << (sizeof(char) << 3)); }
 
-int noise(char *ptr, unsigned min, unsigned xtra, int str) {
+static int noise(char *ptr, unsigned min, unsigned xtra, int str) {
   if (xtra) {
     xtra = rand_mod(xtra);
   }
@@ -1369,17 +1361,17 @@ int noise(char *ptr, unsigned min, unsigned xtra, int str) {
   for (min = 0; min < xtra; min++, ptr++) {
     do {
       *ptr = rand_chr();
-    } while (str && !isalnum((int)*ptr));
+    } while (str && !isalnum((unsigned char)*ptr));
   }
   if (str) {
     *ptr = '\0';
   }
-  return xtra;
+  return (int)xtra;
 }
 
 static int offset;
 
-void prnt_bytes(FILE *o, char *ptr, int m, int l, int n) {
+static void prnt_bytes(FILE *o, const char *ptr, int m, int l, int n) {
   int i;
 
   l += m;
@@ -1400,11 +1392,12 @@ void prnt_bytes(FILE *o, char *ptr, int m, int l, int n) {
   offset += n;
 }
 
-void prnt_array(FILE *o, void *ptr, char *name, int l, char *cast) {
+static void prnt_array(FILE *o, const void *ptr, const char *name, int l,
+                       const char *cast) {
   int m =
-      rand_mod(1 + l / 4); /* Random amount of random pre  padding (offset) */
+      (int)rand_mod((unsigned)(1 + l / 4)); /* Random amount of random pre  padding (offset) */
   int n =
-      rand_mod(1 + l / 4); /* Random amount of random post padding  (tail)  */
+      (int)rand_mod((unsigned)(1 + l / 4)); /* Random amount of random post padding  (tail)  */
   int a = l ? (offset + m) % l : 0;
   if (cast && a) {
     m += l - a;
@@ -1414,16 +1407,21 @@ void prnt_array(FILE *o, void *ptr, char *name, int l, char *cast) {
   fprintf(o, "\n");
   fprintf(o, "#define      %s	(%s(&data[%d]))", name, cast ? cast : "",
           offset + m);
-  prnt_bytes(o, ptr, m, l, n);
+  prnt_bytes(o, (const char *)ptr, m, l, n);
 }
 
-void dump_array(FILE *o, void *ptr, char *name, int l, char *cast) {
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((unused))
+#endif
+// cppcheck-suppress unusedFunction
+static void
+dump_array(FILE *o, void *ptr, const char *name, int l, const char *cast) {
   arc4(ptr, l);
   prnt_array(o, ptr, name, l, cast);
 }
 
-void cleanup_write_c(char *msg1, char *msg2, char *chk1, char *chk2, char *tst1,
-                     char *tst2, char *kwsh, char *name) {
+static void cleanup_write_c(char *msg1, char *msg2, char *chk1, char *chk2,
+                            char *tst1, char *tst2, char *kwsh, char *name) {
   if (msg1) {
     free(msg1);
   }
@@ -1450,7 +1448,8 @@ void cleanup_write_c(char *msg1, char *msg2, char *chk1, char *chk2, char *tst1,
   }
 }
 
-int write_C(char *file, int argc, char *argv[]) {
+// cppcheck-suppress constParameter
+static int write_C(const char *filename, int argc, char * const argv[]) {
   char pswd[256];
   int pswd_z = sizeof(pswd);
   char *msg1 = xstrdup("has expired!\n");
@@ -1460,7 +1459,7 @@ int write_C(char *file, int argc, char *argv[]) {
   char *msg2 = xstrdup("abnormal behavior!");
   char *tst2 = xstrdup("shell has changed!");
   char *chk2 = xstrdup("shell has changed!");
-  char *name = xstrdup(file);
+  char *name = xstrdup(filename);
   int msg1_z;
   int date_z;
   int shll_z;
@@ -1495,7 +1494,6 @@ int write_C(char *file, int argc, char *argv[]) {
     return -1;
   }
 
-  msg1_z = (int)strlen(msg1) + 1;
   date_z = (int)strlen(date) + 1;
   shll_z = (int)strlen(shll) + 1;
   inlo_z = (int)strlen(inlo) + 1;
@@ -1512,7 +1510,7 @@ int write_C(char *file, int argc, char *argv[]) {
 
   /* Encrypt */
   srand((unsigned)time(NULL) ^ (unsigned)getpid());
-  pswd_z = noise(pswd, pswd_z, 0, 0);
+  pswd_z = noise(pswd, (unsigned)pswd_z, 0, 0);
   numd++;
   stte_0();
   key(pswd, pswd_z);
@@ -1601,7 +1599,7 @@ int write_C(char *file, int argc, char *argv[]) {
   fprintf(o, "static  char data[] =");
   do {
     done = 0;
-    l_idx = rand_mod(16);
+    l_idx = (int)rand_mod(16);
     do {
       switch (l_idx) {
       case 0:
@@ -1739,15 +1737,15 @@ int write_C(char *file, int argc, char *argv[]) {
   return 0;
 }
 
-int make(void) {
+static int make(void) {
   const char *cc;
   const char *cflags;
   const char *ldflags;
   const char *strip;
   char *src;
   size_t src_len;
-  struct argv_builder build = {0};
-  struct argv_builder strip_cmd = {0};
+  struct argv_builder build = {NULL, 0, 0};
+  struct argv_builder strip_cmd = {NULL, 0, 0};
   int ret = -1;
 
   if (!file) {
@@ -1763,7 +1761,7 @@ int make(void) {
     errno = EOVERFLOW;
     return -1;
   }
-  src = malloc(src_len + 5);
+  src = (char *)malloc(src_len + 5);
   if (!src) {
     return -1;
   }
@@ -1831,7 +1829,7 @@ out:
   return ret;
 }
 
-void do_all(int argc, char *argv[]) {
+static void do_all(int argc, char *argv[]) {
   parse_args(argc, argv);
   text = read_script(file);
   if (!text) {
@@ -1862,5 +1860,4 @@ int main(int argc, char *argv[]) {
   /* Return on error */
   perror(argv[0]);
   exit(1);
-  return 1;
 }

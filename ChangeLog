@@ -11,6 +11,9 @@ LATEST MON Jul 27 13:20:00 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTI
   * Fix upload-artifact path pattern (/tmp/shc.*/*) and add if-no-files-found: ignore to .github/workflows/ci.yml
   * Pin third-party GitHub Actions (mdeweerd/logToCheckStyle and dorny/paths-filter) to full commit SHAs to resolve CodeQL actions/unpinned-tag security alert
   * Update README.md badge section: added Ko-fi, QRIS, styled PayPal, GitHub sponsor badges, and replaced deprecated Travis CI badge with GitHub Actions CI badge
+  * Fix cppcheck notices and warnings in src/shc.c: added const qualifiers to parameters, renamed local opts to opt_flags, reduced cnt variable scope, removed redundant continue/assignment, and added inline suppressions for indx loops
+  * Fix C/C++ compiler and IDE linter semantic errors in src/shc.c: added explicit (char *) / (char **) casts to malloc/realloc, declared file as const char *, fixed const pointer discarding in eval_shell, updated prnt_bytes to accept const void *, initialized struct argv_builder fields, and joined split string literals in RTC[]
+  * Fix all remaining C compiler (-Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wunreachable-code -Wuninitialized -Wstrict-prototypes) and IDE linter warnings in src/shc.c: initialized expdate=0, removed unreachable breaks after exit(0) in getopt switch, removed unreachable return in main(), refactored eval_shell() to separate line_len and matches variables with %zus format specifiers, added explicit type casts for rand_mod/noise/prnt_array sign and float conversions, and added constParameter / unusedFunction cppcheck suppressions
 
 MON Jul 27 12:43:31 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 

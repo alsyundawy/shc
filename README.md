@@ -148,6 +148,9 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 - **Ci**: Fixed `upload-artifact` path pattern (`/tmp/shc.*/*`) and added `if-no-files-found: ignore` to `.github/workflows/ci.yml`.
 - **Sec**: Pinned third-party GitHub Actions (`mdeweerd/logToCheckStyle` and `dorny/paths-filter`) to full commit SHAs to resolve CodeQL `actions/unpinned-tag` security alert.
 - **Docs**: Updated `README.md` badge section: added Ko-fi, QRIS, styled PayPal, GitHub sponsor badges, and replaced deprecated Travis CI badge with GitHub Actions CI badge.
+- **Qual**: Resolved all `cppcheck` notices in `src/shc.c` by adding `const` qualifiers to pointer parameters (`eval_shell`, `read_script`, `prnt_bytes`, `prnt_array`), renaming local `opts` variable, reducing `cnt` variable scope, removing redundant continue/assignment, and adding inline suppressions for RC4 `indx` loops.
+- **Qual**: Fixed all C/C++ compiler and IDE linter semantic errors in `src/shc.c`: added explicit `(char *)` / `(char **)` casts to `malloc`/`realloc`, declared `file` as `const char *`, fixed `const` pointer discarding in `eval_shell`, updated `prnt_bytes` to accept `const void *`, initialized `struct argv_builder` fields, and joined split string literals in `RTC[]`.
+- **Qual**: Cleared 100% of C compiler (`-Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wunreachable-code -Wuninitialized -Wstrict-prototypes`) and IDE diagnostics in `src/shc.c`: initialized `expdate=0`, removed unreachable `break` statements after `exit(0)`, removed unreachable `return 1` in `main()`, refactored `eval_shell()` to use `line_len` and `matches` with `%zus` specifiers, added explicit sign and float conversion casts in random generators (`rand_mod`, `noise`, `prnt_array`), and added `cppcheck` suppressions.
 
 *Original Credit to [@alsyundawy](https://github.com/alsyundawy)*
 
