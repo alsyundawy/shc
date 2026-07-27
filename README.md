@@ -137,7 +137,21 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 
 > **By HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION**
 
-### 🌟 LATEST: MON Jul 27 12:43:31 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+### 🌟 LATEST: MON Jul 27 13:20:00 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+
+- **Fix**: Fixed `tcsh` and `rc` test failures in `test/ttest.sh` by updating `csh`/`tcsh` shell pattern matching and handling `rc` positional arguments for `-p` option.
+- **Fix**: Formatted `version_credits[]` array in `src/shc.c` with tab indentation and joined split string literals in `RTC[]` array to eliminate compiler warnings.
+- **Ci**: Fixed GitHub Actions `generate.yml` workflow trigger typo (`workflow_dispatch`), autotools filter check, and added `git diff` check before `git commit`.
+- **Ci**: Fixed `pre-commit.yml` workflow `logToCheckStyle` required `out` parameter and `pythonLocation` context reference.
+- **Ci**: Updated `.pre-commit-config.yaml` to exclude `config/` directory from `beautysh`/`codespell`, exclude `test/` from `cppcheck`, and filter `cpplint` multiline comment/int warnings.
+- **Qual**: Updated `pyproject.toml` codespell `ignore-words-list` with domain words (`ttest`, `indx`, `forceing`) and added `sscanf` field width limits to `test/scratch.c`.
+- **Ci**: Fixed `upload-artifact` path pattern (`/tmp/shc.*/*`) and added `if-no-files-found: ignore` to `.github/workflows/ci.yml`.
+- **Sec**: Pinned third-party GitHub Actions (`mdeweerd/logToCheckStyle` and `dorny/paths-filter`) to full commit SHAs to resolve CodeQL `actions/unpinned-tag` security alert.
+- **Docs**: Updated `README.md` badge section: added Ko-fi, QRIS, styled PayPal, GitHub sponsor badges, and replaced deprecated Travis CI badge with GitHub Actions CI badge.
+
+*Original Credit to [@alsyundawy](https://github.com/alsyundawy)*
+
+### MON Jul 27 12:43:31 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
 - **Qual**: Bumped package and internal source version to `4.0.9-Hardened-Audit-2026` across `configure.ac`, `src/shc.c`, `README.md`, and `ChangeLog`.
 - **Fix**: Resolved `-Wformat-nonliteral` compiler warning in `eval_shell()` by wrapping `sscanf()` with `#pragma GCC diagnostic push/ignored/pop` guards.
@@ -147,7 +161,7 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 
 *Original Credit to [@alsyundawy](https://github.com/alsyundawy)*
 
-### 🌟 LATEST: FRI Jul 24 02:07:30 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+### FRI Jul 24 02:07:30 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
 - **Feat**: Added `-V` and `--version` options in `src/shc.c` to print version and exit, keeping POSIX `getopt(3)` compatibility without `getopt_long`.
 - **Feat**: Expanded `shc -V` and `--version` output to include original author, provider/maintainer, core collaborator, SHC contributors, repository URL, and audit hardening credit.
