@@ -8,6 +8,11 @@ on:
   release:
     types: [published]
 
+
+permissions:
+  contents: write
+
+
 env:
   GITHUB_JSON: ${{ toJSON(github) }} # Helps in debugging Github Action
 
