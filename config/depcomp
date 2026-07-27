@@ -2,7 +2,7 @@
 # shellcheck disable=all
 # depcomp - compile a program generating dependencies as side-effects
 
-scriptversion=2026-06-15.15; # UTC
+scriptversion=2025-06-18.21; # UTC
 
 # Copyright (C) 1999-2025 Free Software Foundation, Inc.
 

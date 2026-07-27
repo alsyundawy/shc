@@ -135,7 +135,17 @@ rm -rf ${TMPDIR:-/tmp}/shc.*
 
 > **By HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION**
 
-### 🌟 LATEST: MON Jun 15 23:59:23 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+### 🌟 LATEST: MON Jul 27 12:43:31 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+
+- **Qual**: Bumped package and internal source version to `4.0.9-Hardened-Audit-2026` across `configure.ac`, `src/shc.c`, `README.md`, and `ChangeLog`.
+- **Fix**: Resolved `-Wformat-nonliteral` compiler warning in `eval_shell()` by wrapping `sscanf()` with `#pragma GCC diagnostic push/ignored/pop` guards.
+- **Fix**: Added `__attribute__((unused))` annotation to `original_author` struct declaration to fix `-Wunused-const-variable` compiler warning.
+- **Docs**: Updated `version_credits[]` array in `src/shc.c` to include email `<alsyundawy@gmail.com>` and website `https://alsyundawy.com`.
+- **Style**: Unified `License` entry into `version_credits[]` array and aligned all field labels to 19 characters for perfect colon (`:`) alignment in `shc -V` output.
+
+*Original Credit to [@alsyundawy](https://github.com/alsyundawy)*
+
+### 🌟 LATEST: FRI Jul 24 02:07:30 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
 - **Feat**: Added `-V` and `--version` options in `src/shc.c` to print version and exit, keeping POSIX `getopt(3)` compatibility without `getopt_long`.
 - **Feat**: Expanded `shc -V` and `--version` output to include original author, provider/maintainer, core collaborator, SHC contributors, repository URL, and audit hardening credit.

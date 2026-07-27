@@ -1,4 +1,4 @@
-AC_INIT([shc],[5.0.8-Hardened-Audit-2026],[http://github.com/alsyundawy/shc/issues])
+AC_INIT([shc],[4.0.9-Hardened-Audit-2026],[http://github.com/alsyundawy/shc/issues])
 AC_CONFIG_AUX_DIR(config)
 #prefix="/usr"
 AC_CONFIG_SRCDIR([src/shc.c])

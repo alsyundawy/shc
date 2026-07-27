@@ -2,7 +2,7 @@
 # shellcheck disable=all
 # Common wrapper for a few potentially missing GNU and other programs.
 
-scriptversion=2026-06-15.15; # UTC
+scriptversion=2025-06-18.21; # UTC
 
 # shellcheck disable=SC2006,SC2268 # we must support pre-POSIX shells
 
