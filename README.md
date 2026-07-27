@@ -3,7 +3,7 @@
 Generic Shell Script Compiler with Enhanced Security & Auditing
 
 [![Latest Version](https://img.shields.io/github/v/release/alsyundawy/shc)](https://github.com/alsyundawy/shc/releases)
-[![Build Status](https://img.shields.io/travis/alsyundawy/shc/release)](https://travis-ci.org/alsyundawy/shc)
+[![Build Status](https://github.com/alsyundawy/shc/actions/workflows/ci.yml/badge.svg)](https://github.com/alsyundawy/shc/actions/workflows/ci.yml)
 [![ShellCheck](https://img.shields.io/badge/ShellCheck-Passing-brightgreen.svg)](https://github.com/alsyundawy/shc)
 [![Bash](https://img.shields.io/badge/Shell-Bash%205%2B-orange.svg)](https://github.com/alsyundawy/shc)
 [![Maintenance Status](https://img.shields.io/maintenance/yes/9999)](https://github.com/alsyundawy/shc/)
@@ -15,8 +15,10 @@ Generic Shell Script Compiler with Enhanced Security & Auditing
 [![GitHub Forks](https://img.shields.io/github/forks/alsyundawy/shc?style=social)](https://github.com/alsyundawy/shc/network/members)
 [![GitHub Contributors](https://img.shields.io/github/contributors/alsyundawy/shc?style=social)](https://github.com/alsyundawy/shc/graphs/contributors)
 
-[![Donate with PayPal](https://img.shields.io/badge/PayPal-donate-orange)](https://www.paypal.me/alsyundawy)
-[![Sponsor with GitHub](https://img.shields.io/badge/GitHub-sponsor-orange)](https://github.com/sponsors/alsyundawy)
+[![Donate with PayPal](https://img.shields.io/badge/PayPal-donate-003087?logo=paypal&logoColor=white)](https://www.paypal.me/alsyundawy)
+[![Donate with Ko-fi](https://img.shields.io/badge/Ko--fi-donate-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/alsyundawy)
+[![Donate with QRIS](https://img.shields.io/badge/QRIS-donate-red)](https://github.com/user-attachments/assets/a0126f28-6dde-43da-ba14-d7c9a27de0df)
+[![Sponsor with GitHub](https://img.shields.io/badge/GitHub-sponsor-orange?logo=github&logoColor=white)](https://github.com/sponsors/alsyundawy)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
 Empowering Developers • Securing Shell Scripts • Open Source Passion
