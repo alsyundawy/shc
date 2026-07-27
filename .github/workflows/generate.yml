@@ -39,7 +39,7 @@ jobs:
         run: |
           python3 ${{ github.workspace }}/.github/update_version.py --version ${{ github.ref_name }}
 
-      - uses: dorny/paths-filter@v4
+      - uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
         id: changes
         with:
           filters: |
