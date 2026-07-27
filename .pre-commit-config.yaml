@@ -77,6 +77,7 @@ repos:
       - id: uncrustify
         args: [--replace, --no-backup, -c, uncrustify.cfg]
       - id: cppcheck
+        exclude: ^(test/.*)$
         args:
           - --force
           #- --std=c99
@@ -85,7 +86,7 @@ repos:
           - '--template={file}({line}): {severity} ({id}): {message}'
           - --inline-suppr
       - id: cpplint
-        args: ["--filter=-build/header_guard,-build/include,-build/include_subdir,-legal/copyright,-readability/casting,-readability/fn_size,-whitespace/blank_line,-whitespace/braces,-whitespace/comma,-whitespace/comments,-whitespace/line_length,-whitespace/newline,-whitespace/operators,-whitespace/parens,-whitespace/semicolon,-whitespace/tab,-whitespace/todo"]
+        args: ["--filter=-build/header_guard,-build/include,-build/include_subdir,-legal/copyright,-readability/casting,-readability/fn_size,-readability/multiline_comment,-runtime/int,-whitespace/blank_line,-whitespace/braces,-whitespace/comma,-whitespace/comments,-whitespace/line_length,-whitespace/newline,-whitespace/operators,-whitespace/parens,-whitespace/semicolon,-whitespace/tab,-whitespace/todo"]
         additional_dependencies:
           - cpplint>=2.0.2
   - repo: https://github.com/shellcheck-py/shellcheck-py

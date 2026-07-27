@@ -1,12 +1,14 @@
 # CHANGES - Audit & Hardening by HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
-LATEST MON Jul 27 13:13:00 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+LATEST MON Jul 27 13:20:00 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
   * Fix tcsh and rc test failures in test/ttest.sh by updating csh/tcsh shell pattern matching and handling rc positional arguments for -p option
   * Format version_credits[] array in src/shc.c with tab indentation and join split string literals in RTC[] array to eliminate compiler string warnings
   * Fix GitHub Actions generate.yml workflow trigger typo (workflow_dispatch), autotools filter check, and add git diff check before git commit
   * Fix pre-commit.yml workflow logToCheckStyle required out parameter and pythonLocation context reference
-  * Update .pre-commit-config.yaml to exclude config/ directory and autotools helper scripts from beautysh and codespell hooks
+  * Update .pre-commit-config.yaml to exclude config/ directory from beautysh/codespell, exclude test/ from cppcheck, and filter cpplint multiline comment / int warnings
+  * Update pyproject.toml codespell ignore-words-list with domain words (ttest, indx, forceing) and add sscanf field width limits to test/scratch.c
+  * Fix upload-artifact path pattern (/tmp/shc.*/*) and add if-no-files-found: ignore to .github/workflows/ci.yml
 
 MON Jul 27 12:43:31 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 

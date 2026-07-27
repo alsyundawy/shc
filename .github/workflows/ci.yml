@@ -58,9 +58,10 @@ jobs:
 
     - name: Provide log as artifact
       uses: actions/upload-artifact@v7
-      if: ${{ ! cancelled() }}
+      if: ${{ failure() }}
       with:
         name: shc.failingtests
         path: |
-          /tmp/shc.*.tst/*
+          /tmp/shc.*/*
+        if-no-files-found: ignore
         retention-days: 2
