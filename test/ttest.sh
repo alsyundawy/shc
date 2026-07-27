@@ -112,16 +112,16 @@ for shell in "${shells[@]}"; do
                 default_echo="${default_echo//)/\}}"
                 echo 'import sys; sys.stdout.write("'"${default_echo}"'".format(*sys.argv)+"\n")'
             elif [[ "$BASESHELL" == "rc" ]] ; then
-                default_echo="${default_echo//\(/\$}"
-                default_echo="${default_echo//)/}"
                 arg_only_echo="${arg_only_echo//\(/\$}"
                 arg_only_echo="${arg_only_echo//)/}"
-                if [[ "$opt" != "-P" ]] ; then
-                    echo "echo ${default_echo}"
+                if [[ "$opt" == "-p" ]] ; then
+                    rc_echo="${arg_only_echo//\$1/\$*(2)}"
+                    rc_echo="${rc_echo//\$2/\$*(3)}"
+                    echo "echo ${rc_echo}"
                 else
                     echo "echo ${arg_only_echo}"
-                    expected="${arg_only_expected}"
                 fi
+                expected="${arg_only_expected}"
             elif [[ "${shell#*/perl}" != "$shell" ]] ; then
                 default_echo="${default_echo//\(/\$ARGV\[}"
                 default_echo="${default_echo//)/\]}"
@@ -129,7 +129,7 @@ for shell in "${shells[@]}"; do
                 default_echo="${default_echo//1/0}"
                 default_echo="${default_echo//2/1}"
                 echo 'print "'"${default_echo}"'";'
-            elif [[ "${shell#*/csh}" != "$shell" ]] ; then
+            elif [[ "${shell#*csh}" != "$shell" ]] ; then
                 arg_only_echo="${arg_only_echo//\(/\$}"
                 arg_only_echo="${arg_only_echo//)/}"
                 echo 'echo "'"${arg_only_echo}"'"'

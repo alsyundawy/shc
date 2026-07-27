@@ -1,6 +1,14 @@
 # CHANGES - Audit & Hardening by HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
-LATEST MON Jul 27 12:43:31 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+LATEST MON Jul 27 13:13:00 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+
+  * Fix tcsh and rc test failures in test/ttest.sh by updating csh/tcsh shell pattern matching and handling rc positional arguments for -p option
+  * Format version_credits[] array in src/shc.c with tab indentation and join split string literals in RTC[] array to eliminate compiler string warnings
+  * Fix GitHub Actions generate.yml workflow trigger typo (workflow_dispatch), autotools filter check, and add git diff check before git commit
+  * Fix pre-commit.yml workflow logToCheckStyle required out parameter and pythonLocation context reference
+  * Update .pre-commit-config.yaml to exclude config/ directory and autotools helper scripts from beautysh and codespell hooks
+
+MON Jul 27 12:43:31 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
   * Bump package and internal source version to 4.0.9-Hardened-Audit-2026 in configure.ac, src/shc.c, README.md, and ChangeLog
   * Fix -Wformat-nonliteral compiler warning in eval_shell() by guarding dynamic sscanf format string with GCC/Clang diagnostic pragmas
@@ -8,7 +16,7 @@ LATEST MON Jul 27 12:43:31 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTI
   * Update version_credits[] array in src/shc.c to include email <alsyundawy@gmail.com> and website <https://alsyundawy.com>
   * Unify License line into version_credits[] and align all version field labels to 19 characters for perfect colon (:) alignment at index 24 in shc -V output
 
-LATEST FRI Jul 24 02:07:30 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
+FRI Jul 24 02:07:30 WIB 2026 - HARRY DS ALSYUNDAWY - ALSYUNDAWY IT SOLUTION
 
   * Fix HTML document attributes, remove duplicate CSS selectors, and add aria-label attributes to code line anchors in man.html to resolve IDE linter warnings
   * Create .markdownlintignore configuration to exclude plain-text license and project documentation files (COPYING, AUTHORS, ChangeLog, INSTALL, NEWS) from markdownlint checks

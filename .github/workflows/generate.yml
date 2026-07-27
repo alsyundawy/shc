@@ -49,29 +49,33 @@ jobs:
               - 'aclocal.m4'
               - 'configure.ac'
       - uses: docker://pandoc/core:3.3
-        if: ${{ github.event_name == 'workflow_dispath' || steps.changes.outputs.man == 'true' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.changes.outputs.man == 'true' }}
         with:
           args: -s man.md -t man -o shc.1
       - uses: docker://pandoc/core:3.3
-        if: ${{ github.event_name == 'workflow_dispath' || steps.changes.outputs.man == 'true' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.changes.outputs.man == 'true' }}
         with:
           args: -s man.md -t html -o man.html
       - run: |-
           ./autogen.sh
           # Correct executable flag on generated files
           chmod -x INSTALL
-        if: ${{ github.event_name == 'workflow_dispath' || steps.changes.outputs.autotools == 'true' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.changes.outputs.autotools == 'true' }}
       - name: Commit changes
-        if: ${{ github.event_name == 'workflow_dispath' || steps.changes.outputs.man == 'true' || steps.changes.outputs.autotools || startsWith(github.ref, 'ref/tags/v') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.changes.outputs.man == 'true' || steps.changes.outputs.autotools == 'true' || startsWith(github.ref_name, 'v') || startsWith(github.ref_name, '4') }}
         run: |-
           for r in $(git remote) ; do git remote get-url --all $r ; done
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git commit -a -m "ci: Github Action Generate Files"
-          git push
+          if ! git diff --quiet; then
+            git commit -a -m "ci: Github Action Generate Files"
+            git push
+          else
+            echo "No changes to commit"
+          fi
 
       - name: Move tag on release
-        if: ${{ startsWith(github.ref, 'ref/tags/v') && ( github.event_name == 'workflow_dispath' || steps.changes.outputs.man == 'true' || steps.changes.outputs.autotools ) }}
+        if: ${{ (startsWith(github.ref_name, 'v') || startsWith(github.ref_name, '4')) && ( github.event_name == 'workflow_dispatch' || steps.changes.outputs.man == 'true' || steps.changes.outputs.autotools == 'true' ) }}
         run: |-
           git tag -fa "${{ github.ref_name }}" -m "Update ${{ github.ref_name }} tag"
           git push origin --force tag "${{ github.ref_name }}"

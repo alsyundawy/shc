@@ -49,15 +49,16 @@ static const struct {
 } original_author = {"Francisco", "Garcia", "<frosal@fi.upm.es>"};
 
 static const char *version_credits[] = {
-    "License             : GNU GPL Version 3",
-    "Original author     : Francisco Garcia <frosal@fi.upm.es>",
-    "Provider/Maintainer : Md Jahidul Hamid <jahidulhamid@yahoo.com>",
-    "Core collaborator   : @mdeweerd and SHC contributors",
-    "Audit & Hardening   : HARRY DS ALSYUNDAWY <alsyundawy@gmail.com>",
-    "Organization        : ALSYUNDAWY IT SOLUTION (2026)",
-    "Website             : https://alsyundawy.com",
-    "Repository          : https://github.com/alsyundawy/shc",
-    0};
+	"License             : GNU GPL Version 3",
+	"Original author     : Francisco Garcia <frosal@fi.upm.es>",
+	"Provider/Maintainer : Md Jahidul Hamid <jahidulhamid@yahoo.com>",
+	"Core collaborator   : @mdeweerd and SHC contributors",
+	"Audit & Hardening   : HARRY DS ALSYUNDAWY <alsyundawy@gmail.com>",
+	"Organization        : ALSYUNDAWY IT SOLUTION (2026)",
+	"Website             : https://alsyundawy.com",
+	"Repository          : https://github.com/alsyundawy/shc",
+	0
+};
 
 /*This is the original author who first came up with this*/
 
@@ -225,15 +226,11 @@ static const char *RTC[] = {
     "\"static int mymain(int argc, char** argv, char** env) {\",",
     "\"	//fprintf(stderr, \\\"Inject main argc = %d\\\\n\\\", argc);\",",
     "\"	return real_main(argc, copyargs(argc,argv), env);\",", "\"}\",",
-    "\"\",", "\"int __libc_start_main(\",",
-    "\"	int (*main) (int, char**, char**),\",", "\"	int argc,\",",
-    "\"	char **argv,\",", "\"	void (*init) (void),\",",
-    "\" 	void (*fini)(void),\",", "\"	void (*rtld_fini)(void),\",",
-    "\"	void (*stack_end)\",", "\") {\",",
+    "\"\",",
+    "\"int __libc_start_main(int (*main) (int, char**, char**), int argc, char **argv, void (*init) (void), void (*fini)(void), void (*rtld_fini)(void), void (*stack_end)) {\",",
     "\"	static int (*real___libc_start_main)() = NULL;\",", "\"	int n;\",",
     "\"\",", "\"	if (!real___libc_start_main) {\",",
-    "\"		real___libc_start_main = dlsym(RTLD_NEXT, "
-    "\\\"__libc_start_main\\\");\",",
+    "\"		real___libc_start_main = dlsym(RTLD_NEXT, \\\"__libc_start_main\\\");\",",
     "\"		if (!real___libc_start_main) abort();\",", "\"	}\",",
     "\"\",", "\"	n = read(21, secret, sizeof(secret));\",",
     "\"	if (n > 0) {\",", "\"		int i;\",", "\"\",",
@@ -243,8 +240,7 @@ static const char *RTC[] = {
     "\"				argv[i] = secret;\",",
     "\"			}\",", "\"		}\",", "\"	}\",", "\"\",",
     "\"	real_main = main;\",", "\"\",",
-    "\"	return real___libc_start_main(mymain, argc, argv, init, fini, "
-    "rtld_fini, stack_end);\",",
+    "\"	return real___libc_start_main(mymain, argc, argv, init, fini, rtld_fini, stack_end);\",",
     "\"}\",", "\"\",", "0};", "#endif /* HARDENING */", "", "/* rtc.c */", "",
     "#ifndef _GNU_SOURCE", "#define _GNU_SOURCE", "#endif",
     "#ifndef _DEFAULT_SOURCE", "#define _DEFAULT_SOURCE", "#endif",
@@ -346,8 +342,7 @@ static const char *RTC[] = {
     "	fprintf(stderr, \"argc=%d\\n\", argc);", "	if (!argv) {",
     "		fprintf(stderr, \"argv=<null>\\n\");", "	} else {",
     "		for (i = 0; i <= argc ; i++) {",
-    "			fprintf(stderr, \"argv[%d]=%s\\n\", i, argv[i] ? "
-    "argv[i] : \"<null>\");",
+    "			fprintf(stderr, \"argv[%d]=%s\\n\", i, argv[i] ? argv[i] : \"<null>\");",
     "		}", "	}", "}", "#endif /* DEBUGEXEC */", "",
     "void rmarg(char ** argv, char * arg) {",
     "	for (; argv && *argv && *argv != arg; argv++) {}",
