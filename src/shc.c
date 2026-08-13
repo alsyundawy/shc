@@ -820,13 +820,27 @@ static void print_version(FILE *out) {
   }
 }
 
+static void print_version_intro(void) {
+  fprintf(stderr, "%s %s, %s\n", my_name, version, subject);
+  fprintf(stderr, "%s %s %s %s %s\n", my_name, cpright, provider.f,
+          provider.s, provider.e);
+}
+
+static void print_string_list(const char *const *list) {
+  int i;
+  fprintf(stderr, "%s ", my_name);
+  for (i = 0; list[i]; i++) {
+    fprintf(stderr, "%s\n", list[i]);
+  }
+}
+
 static int parse_an_arg(int argc, char *argv[]) {
   extern char *optarg;
   extern int optind;
   const char *opt_flags = "e:m:i:x:l:o:f:2ABCDhHpPrSUVv";
   struct tm tmp[1];
   time_t expdate = 0;
-  int cnt, l;
+  int cnt;
   char ctrl;
 
   if (optind < argc && strcmp(argv[optind], "--version") == 0) {
@@ -927,32 +941,18 @@ static int parse_an_arg(int argc, char *argv[]) {
     HARDENING_flag = 1;
     break;
   case 'C':
-    fprintf(stderr, "%s %s, %s\n", my_name, version, subject);
-    fprintf(stderr, "%s %s %s %s %s\n", my_name, cpright, provider.f,
-            provider.s, provider.e);
-    fprintf(stderr, "%s ", my_name);
-    for (l = 0; copying[l]; l++) {
-      fprintf(stderr, "%s\n", copying[l]);
-    }
+    print_version_intro();
+    print_string_list(copying);
     fprintf(stderr, "    %s %s %s\n\n", provider.f, provider.s, provider.e);
     exit(0);
   case 'A':
-    fprintf(stderr, "%s %s, %s\n", my_name, version, subject);
-    fprintf(stderr, "%s %s %s %s %s\n", my_name, cpright, provider.f,
-            provider.s, provider.e);
-    fprintf(stderr, "%s ", my_name);
-    for (l = 0; abstract[l]; l++) {
-      fprintf(stderr, "%s\n", abstract[l]);
-    }
+    print_version_intro();
+    print_string_list(abstract);
     exit(0);
   case 'h':
-    fprintf(stderr, "%s %s, %s\n", my_name, version, subject);
-    fprintf(stderr, "%s %s %s %s %s\n", my_name, cpright, provider.f,
-            provider.s, provider.e);
+    print_version_intro();
     fprintf(stderr, "%s %s\n", my_name, usage);
-    for (l = 0; help[l]; l++) {
-      fprintf(stderr, "%s\n", help[l]);
-    }
+    print_string_list(help);
     exit(0);
   case -1:
     if (!file) {
@@ -1161,7 +1161,7 @@ static int eval_shell(const char *script_text) {
       free(opts);
     return -1;
   }
-  strncpy(ptr, script_text, line_len);
+  memcpy(ptr, script_text, line_len);
   ptr[line_len] = '\0';
 
   *opts = '\0';
@@ -1340,15 +1340,90 @@ static char *read_script(const char *filename) {
   return l_text;
 }
 
-static unsigned rand_mod(unsigned mod) {
-  /* Without skew */
-  unsigned rnd, top = (unsigned)RAND_MAX;
-  top -= top % mod;
-  while (top <= (rnd = (unsigned)rand())) { // NOLINT
+/*
+ * Cryptographically strong random source.
+ *
+ * The previous implementation drew from the weak, predictable
+ * rand()/RAND_MAX PRNG (DevSkim DS148264). The obfuscation key and the
+ * data padding now come from the operating system CSPRNG instead, which
+ * also removes the need for srand() seeding.
+ */
+#if defined(_WIN32)
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#include <bcrypt.h>
+#else
+#include <windows.h>
+#include <wincrypt.h>
+#endif
+#endif
+
+static unsigned char csprng_buf[256];
+static size_t csprng_pos = sizeof(csprng_buf);
+
+static int csprng_refill(void) {
+  csprng_pos = 0;
+#if defined(_WIN32)
+#if defined(__MINGW32__) || defined(__MINGW64__)
+  if (BCryptGenRandom(NULL, csprng_buf, (ULONG)sizeof(csprng_buf),
+                      BCRYPT_USE_SYSTEM_PREFERRED_RNG) != 0) {
+    return -1;
   }
-  /* Using high-order bits. */
-  rnd = (unsigned)(1.0 * mod * rnd / (1.0 + top));
-  return rnd;
+#else
+  HCRYPTPROV h;
+  if (!CryptAcquireContext(&h, NULL, NULL, PROV_RSA_FULL,
+                            CRYPT_VERIFYCONTEXT)) {
+    return -1;
+  }
+  int rc =
+      CryptGenRandom(h, (DWORD)sizeof(csprng_buf), csprng_buf) ? 0 : -1;
+  CryptReleaseContext(h, 0);
+  if (rc != 0) {
+    return -1;
+  }
+#endif
+#else
+  int fd = open("/dev/urandom", O_RDONLY);
+  if (fd < 0) {
+    return -1;
+  }
+  size_t got = 0;
+  while (got < sizeof(csprng_buf)) {
+    ssize_t n = read(fd, csprng_buf + got, sizeof(csprng_buf) - got);
+    if (n <= 0) {
+      close(fd);
+      return -1;
+    }
+    got += (size_t)n;
+  }
+  close(fd);
+#endif
+  return 0;
+}
+
+static unsigned csprng_u32(void) {
+  if (csprng_pos + 4 > sizeof(csprng_buf)) {
+    if (csprng_refill() != 0) {
+      /* A predictable fallback would defeat the obfuscation, so abort
+         rather than emit guessable bytes. */
+      fprintf(stderr, "%s: failed to obtain random bytes\n", my_name);
+      exit(1);
+    }
+  }
+  unsigned v = (unsigned)csprng_buf[csprng_pos] |
+               ((unsigned)csprng_buf[csprng_pos + 1] << 8) |
+               ((unsigned)csprng_buf[csprng_pos + 2] << 16) |
+               ((unsigned)csprng_buf[csprng_pos + 3] << 24);
+  csprng_pos += 4;
+  return v;
+}
+
+static unsigned rand_mod(unsigned mod) {
+  /* Rejection sampling to avoid modulo bias, using the CSPRNG. */
+  unsigned rnd, top = (unsigned)0xffffffffu;
+  top -= top % mod;
+  while (top <= (rnd = csprng_u32())) {
+  }
+  return rnd % mod;
 }
 
 static char rand_chr(void) { return (char)rand_mod(1U << (sizeof(char) << 3)); }
@@ -1509,7 +1584,6 @@ static int write_C(const char *filename, int argc, char * const argv[]) {
   chk2_z = tst2_z;
 
   /* Encrypt */
-  srand((unsigned)time(NULL) ^ (unsigned)getpid());
   pswd_z = noise(pswd, (unsigned)pswd_z, 0, 0);
   numd++;
   stte_0();

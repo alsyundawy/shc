@@ -1,0 +1,10 @@
+# MegaLinter configuration
+#
+# Keep copy-paste (jscpd) scanning focused on hand-written source.
+# config/, configure, Makefile.in, aclocal.m4, *.m4 and autom4te.cache are
+# generated GNU Autotools scaffolding. They are near-identical boilerplate
+# shared across virtually every autotooled project, so they must not count
+# toward the duplication metric (this was the only thing pushing the
+# duplicated-lines ratio above the threshold).
+COPYPASTE:
+  FILTER_REGEX_EXCLUDE: '((^|/)config/|^configure$|^configure\.ac$|^Makefile\.in$|^aclocal\.m4$|autom4te\.cache|\.m4$)'

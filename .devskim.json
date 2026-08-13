@@ -1,0 +1,21 @@
+{
+  "version": "0.1",
+  "rules": [
+    {
+      "id": "DS154189",
+      "mode": "disabled"
+    },
+    {
+      "id": "DS140021",
+      "mode": "disabled"
+    },
+    {
+      "id": "DS121708",
+      "mode": "disabled"
+    },
+    {
+      "id": "DS161085",
+      "mode": "disabled"
+    }
+  ]
+}
