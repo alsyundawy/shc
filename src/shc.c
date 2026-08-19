@@ -229,7 +229,7 @@ static const char *RTC[] = {
     "\"void (*stack_end)) {\",",
     "\"	static int (*real___libc_start_main)() = NULL;\",", "\"	int n;\",",
     "\"\",", "\"	if (!real___libc_start_main) {\",",
-    "\"		real___libc_start_main = dlsym(RTLD_NEXT, \",",
+    "\"		real___libc_start_main = dlsym(RTLD_NEXT, "
     "\\\"__libc_start_main\\\");\",",
     "\"		if (!real___libc_start_main) abort();\",", "\"	}\",", "\"\",",
     "\"	n = read(21, secret, sizeof(secret));\",", "\"	if (n > 0) {\",",
@@ -239,7 +239,7 @@ static const char *RTC[] = {
     "\"			if (strcmp(argv[i], PLACEHOLDER) == 0) {\",",
     "\"				argv[i] = secret;\",",
     "\"			}\",", "\"		}\",", "\"	}\",", "\"\",",
-    "\"	real_main = main;\",", "\"\",",
+    "\"	real_main = main;\",", "\"\",", // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
     "\"	return real___libc_start_main(mymain, argc, argv, init, fini, "
     "rtld_fini, stack_end);\",",
     "\"}\",", "\"\",", "0};", "#endif /* HARDENING */", "", "/* rtc.c */", "",
