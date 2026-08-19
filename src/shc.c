@@ -407,7 +407,7 @@ static const char *RTC[] = {
     "	#if !defined(PTRACE_ATTACH) && defined(PT_ATTACH)",
     "		#define PT_ATTACHEXC	PT_ATTACH",
     "	#elif defined(PTRACE_ATTACH)",
-    "		#define PT_ATTACHEXC PTRACE_ATTACH", "	#endif", "#endif", "",
+    "		#define PT_ATTACHEXC PTRACE_ATTACH", "	#endif", "#endif", "#if !defined(PTRACE_DETACH) && defined(PT_DETACH)", "	#define PTRACE_DETACH	PT_DETACH", "#endif", "",
     "void untraceable(char * argv0) {", "	char proc[80];",
     "	int pid, mine;", "", "	switch(pid = fork()) {",
     "	case  0:", "		pid = getppid();",
