@@ -70,7 +70,7 @@ repos:
         additional_dependencies:
           - tomli
   - repo: https://github.com/pocc/pre-commit-hooks
-    rev: v1.3.5
+    rev: v1.4.0
     # Install dependencies on windows:
     #  choco install llvm uncrustify cppcheck
     hooks:
@@ -96,7 +96,7 @@ repos:
         exclude: (?x)^(test/test.*)$
         # args: [-x,-e1007,-e1009,-e1072,-e1073]
   - repo: https://github.com/pocc/pre-commit-hooks
-    rev: v1.3.5
+    rev: v1.4.0
     hooks:
       - id: clang-format
         stages: [manual]
